@@ -234,16 +234,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              // 2. White Sheet Body with Curved Top
+              // 2. Orange Curved Categories Banner
+              _buildOrangeCategoriesBar(state),
+
+              // 3. White Sheet Body
               Expanded(
                 child: Container(
                   width: double.infinity,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(36),
-                    ),
-                  ),
+                  color: Colors.white,
                   child: RefreshIndicator(
                     color: AppColors.primaryOrange,
                     onRefresh: () async {
@@ -251,14 +249,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                     child: SingleChildScrollView(
                       physics: const AlwaysScrollableScrollPhysics(),
-                      padding: const EdgeInsets.only(top: 24, bottom: 80),
+                      padding: const EdgeInsets.only(top: 20, bottom: 80),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // 5 Categories Row
-                          _buildCategoriesRow(state),
-                          const SizedBox(height: 24),
-
                           // Content based on state
                           if (state is RecipeLoading) ...[
                             _buildShimmerSection(),
@@ -342,58 +336,77 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildCategoriesRow(RecipeState state) {
+  Widget _buildOrangeCategoriesBar(RecipeState state) {
     final currentCat = state is RecipeSuccess
         ? state.category
         : (state is RecipeLoading ? state.category : RecipeCategory.all);
+    final activeCat = (currentCat == RecipeCategory.all)
+        ? RecipeCategory.snacks
+        : currentCat;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+    return Container(
+      width: double.infinity,
+      height: 98,
+      decoration: const BoxDecoration(
+        color: AppColors.primaryOrange,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(36)),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: _categories.map((item) {
           final cat = item['cat'] as RecipeCategory;
-          final isSelected = currentCat == cat;
+          final isSelected = activeCat == cat;
 
           return GestureDetector(
             onTap: () => _onCategorySelected(cat),
-            child: Column(
-              children: [
-                Container(
-                  width: 54,
-                  height: 54,
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? AppColors.primaryOrange
-                        : AppColors.creamCard,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
+            behavior: HitTestBehavior.opaque,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: isSelected ? 66 : 58,
+              height: 98,
+              decoration: isSelected
+                  ? const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(30),
                       ),
-                    ],
+                    )
+                  : null,
+              padding: const EdgeInsets.only(top: 8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: isSelected ? 48 : 44,
+                    height: isSelected ? 48 : 44,
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? AppColors.primaryYellow
+                          : const Color(0xFFFDEECF),
+                      shape: BoxShape.circle,
+                    ),
+                    padding: EdgeInsets.all(isSelected ? 10 : 9),
+                    child: Image.asset(
+                      item['icon'] as String,
+                      color: AppColors.primaryOrange,
+                      fit: BoxFit.contain,
+                    ),
                   ),
-                  padding: const EdgeInsets.all(8),
-                  child: Image.asset(
-                    item['icon'] as String,
-                    color: isSelected ? Colors.white : AppColors.primaryOrange,
-                    fit: BoxFit.contain,
+                  SizedBox(height: isSelected ? 5 : 7),
+                  Text(
+                    item['label'] as String,
+                    style: TextStyle(
+                      fontSize: isSelected ? 12.5 : 12,
+                      fontWeight: isSelected
+                          ? FontWeight.w800
+                          : FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  item['label'] as String,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                    color: isSelected
-                        ? AppColors.primaryOrange
-                        : AppColors.textPrimary,
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         }).toList(),
