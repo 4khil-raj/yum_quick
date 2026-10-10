@@ -68,7 +68,7 @@ class MainNavigationShell extends StatelessWidget {
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           color: AppColors.primaryOrange,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
           boxShadow: [
             BoxShadow(
               color: Colors.black12,
@@ -80,7 +80,7 @@ class MainNavigationShell extends StatelessWidget {
         child: SafeArea(
           top: false,
           child: SizedBox(
-            height: 64,
+            height: 68,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -129,38 +129,33 @@ class MainNavigationShell extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       onTap: () => _onItemTapped(index),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              padding: const EdgeInsets.all(4),
-              decoration: isSelected
-                  ? BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.22),
-                      shape: BoxShape.circle,
-                    )
-                  : null,
-              child:
-                  icon ??
+            AnimatedOpacity(
+              duration: const Duration(milliseconds: 200),
+              opacity: isSelected ? 1.0 : 0.80,
+              child: icon ??
                   Image.asset(
                     assetPath!,
-                    width: 24,
-                    height: 24,
+                    width: 28,
+                    height: 28,
                     color: Colors.white,
+                    fit: BoxFit.contain,
                   ),
             ),
-            if (isSelected)
-              Container(
-                margin: const EdgeInsets.only(top: 2),
-                width: 4,
-                height: 4,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
+            const SizedBox(height: 3),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: isSelected ? 4 : 0,
+              height: isSelected ? 4 : 0,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
               ),
+            ),
           ],
         ),
       ),
