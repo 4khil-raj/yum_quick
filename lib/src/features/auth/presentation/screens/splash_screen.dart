@@ -70,18 +70,8 @@ class _SplashScreenState extends State<SplashScreen>
               children: [
                 Image.asset(
                   AppAssets.logoOrange,
-                  width: 220,
+                  width: 240,
                   fit: BoxFit.contain,
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Deliver Favourite Food',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                    letterSpacing: 0.5,
-                  ),
                 ),
               ],
             ),

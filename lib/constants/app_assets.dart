@@ -16,6 +16,13 @@ class AppAssets {
   static const String icBeverages = 'assets/icons/ic_beverages.png';
   static const String icVegetables = 'assets/icons/ic_vegetables.png';
 
+  // Bottom Navigation Bar Icons (Figma matched)
+  static const String navHome = 'assets/icons/nav_home.png';
+  static const String navMenu = 'assets/icons/nav_menu.png';
+  static const String navFavorite = 'assets/icons/nav_favorite.png';
+  static const String navOrders = 'assets/icons/nav_orders.png';
+  static const String navSupport = 'assets/icons/nav_support.png';
+
   // Navigation & Utility Icons
   static const String icArrowRight = 'assets/icons/ic_arrow_right.png';
   static const String icArrowBack = 'assets/icons/ic_arrow_back.png';

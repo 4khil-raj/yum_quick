@@ -24,7 +24,7 @@ class WelcomeScreen extends StatelessWidget {
                 // Yellow YumQuick Logo
                 Image.asset(
                   AppAssets.logoYellow,
-                  width: 210,
+                  width: 240,
                   fit: BoxFit.contain,
                 ),
                 const SizedBox(height: 24),

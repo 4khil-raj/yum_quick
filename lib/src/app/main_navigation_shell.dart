@@ -87,31 +87,27 @@ class MainNavigationShell extends StatelessWidget {
                 _buildNavItem(
                   index: 0,
                   currentIndex: currentIndex,
-                  icon: const Icon(
-                    Icons.home_outlined,
-                    color: Colors.white,
-                    size: 26,
-                  ),
+                  assetPath: AppAssets.navHome,
                 ),
                 _buildNavItem(
                   index: 1,
                   currentIndex: currentIndex,
-                  assetPath: AppAssets.icDineIn,
+                  assetPath: AppAssets.navMenu,
                 ),
                 _buildNavItem(
                   index: 2,
                   currentIndex: currentIndex,
-                  assetPath: AppAssets.icFavorite,
+                  assetPath: AppAssets.navFavorite,
                 ),
                 _buildNavItem(
                   index: 3,
                   currentIndex: currentIndex,
-                  assetPath: AppAssets.icOrders,
+                  assetPath: AppAssets.navOrders,
                 ),
                 _buildNavItem(
                   index: 4,
                   currentIndex: currentIndex,
-                  assetPath: AppAssets.icHeadset,
+                  assetPath: AppAssets.navSupport,
                 ),
               ],
             ),

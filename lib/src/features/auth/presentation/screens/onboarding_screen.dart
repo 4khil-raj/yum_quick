@@ -173,8 +173,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           children: [
                             // Outlined Orange Icon
                             SizedBox(
-                              width: 48,
-                              height: 48,
+                              width: 68,
+                              height: 68,
                               child: Image.asset(
                                 _slides[_currentIndex]['icon']!,
                                 fit: BoxFit.contain,

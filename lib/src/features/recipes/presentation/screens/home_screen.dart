@@ -163,8 +163,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               return _buildCircleHeaderAction(
                                 icon: Image.asset(
                                   AppAssets.icCart,
-                                  width: 18,
-                                  height: 18,
+                                  width: 21,
+                                  height: 21,
                                   color: AppColors.primaryOrange,
                                 ),
                                 badgeCount: count,
@@ -178,8 +178,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           _buildCircleHeaderAction(
                             icon: Image.asset(
                               AppAssets.icNotification,
-                              width: 18,
-                              height: 18,
+                              width: 21,
+                              height: 21,
                               color: AppColors.primaryOrange,
                             ),
                             onTap: () {
@@ -196,8 +196,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           _buildCircleHeaderAction(
                             icon: Image.asset(
                               AppAssets.icProfile,
-                              width: 18,
-                              height: 18,
+                              width: 21,
+                              height: 21,
                               color: AppColors.primaryOrange,
                             ),
                             onTap: () => context.push('/profile'),
@@ -372,7 +372,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
-                  padding: const EdgeInsets.all(13),
+                  padding: const EdgeInsets.all(8),
                   child: Image.asset(
                     item['icon'] as String,
                     color: isSelected ? Colors.white : AppColors.primaryOrange,
