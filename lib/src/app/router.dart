@@ -21,6 +21,7 @@ import '../features/recipes/presentation/screens/home_screen.dart';
 import '../features/recipes/presentation/screens/menu_screen.dart';
 import '../features/recipes/presentation/screens/recipe_detail_screen.dart';
 import '../features/recipes/presentation/screens/recommendations_screen.dart';
+import '../features/search/presentation/screens/filter_screen.dart';
 import '../features/support/presentation/screens/support_chat_screen.dart';
 import 'main_navigation_shell.dart';
 
@@ -67,6 +68,12 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               path: '/menu',
               builder: (context, state) => const MenuScreen(),
+              routes: [
+                GoRoute(
+                  path: 'filter',
+                  builder: (context, state) => const FilterScreen(),
+                ),
+              ],
             ),
           ],
         ),
@@ -101,6 +108,7 @@ final GoRouter appRouter = GoRouter(
     ),
 
     // Push Details & Sub-screens
+    GoRoute(path: '/filter', builder: (context, state) => const FilterScreen()),
     GoRoute(
       path: '/recipe-detail',
       parentNavigatorKey: _rootNavigatorKey,

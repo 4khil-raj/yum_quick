@@ -137,7 +137,8 @@ class MainNavigationShell extends StatelessWidget {
             AnimatedOpacity(
               duration: const Duration(milliseconds: 200),
               opacity: isSelected ? 1.0 : 0.80,
-              child: icon ??
+              child:
+                  icon ??
                   Image.asset(
                     assetPath!,
                     width: 28,

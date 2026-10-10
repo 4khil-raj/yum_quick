@@ -32,11 +32,25 @@ class UpdateFilterReq extends SearchEvent {
   final RecipeCategory? category;
   final SortOption? sortOption;
   final double? maxPrice;
+  final double? minRating;
+  final Set<String>? selectedTags;
 
-  const UpdateFilterReq({this.category, this.sortOption, this.maxPrice});
+  const UpdateFilterReq({
+    this.category,
+    this.sortOption,
+    this.maxPrice,
+    this.minRating,
+    this.selectedTags,
+  });
 
   @override
-  List<Object?> get props => [category, sortOption, maxPrice];
+  List<Object?> get props => [
+    category,
+    sortOption,
+    maxPrice,
+    minRating,
+    selectedTags,
+  ];
 }
 
 class ClearFiltersReq extends SearchEvent {

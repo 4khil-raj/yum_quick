@@ -132,18 +132,21 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                       ),
                                     ),
-                                    Container(
-                                      width: 28,
-                                      height: 28,
-                                      decoration: const BoxDecoration(
-                                        color: AppColors.primaryOrange,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      padding: const EdgeInsets.all(6),
-                                      child: const Icon(
-                                        Icons.tune_rounded,
-                                        size: 16,
-                                        color: Colors.white,
+                                    GestureDetector(
+                                      onTap: () => context.push('/menu/filter'),
+                                      child: Container(
+                                        width: 28,
+                                        height: 28,
+                                        decoration: const BoxDecoration(
+                                          color: AppColors.primaryOrange,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        padding: const EdgeInsets.all(6),
+                                        child: const Icon(
+                                          Icons.tune_rounded,
+                                          size: 16,
+                                          color: Colors.white,
+                                        ),
                                       ),
                                     ),
                                   ],

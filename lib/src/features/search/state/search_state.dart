@@ -9,16 +9,27 @@ sealed class SearchState extends Equatable {
   final RecipeCategory selectedCategory;
   final SortOption sortOption;
   final double maxPrice;
+  final double minRating;
+  final Set<String> selectedTags;
 
   const SearchState({
     this.query = '',
     this.selectedCategory = RecipeCategory.all,
     this.sortOption = SortOption.relevance,
     this.maxPrice = 500.0,
+    this.minRating = 0.0,
+    this.selectedTags = const {},
   });
 
   @override
-  List<Object?> get props => [query, selectedCategory, sortOption, maxPrice];
+  List<Object?> get props => [
+    query,
+    selectedCategory,
+    sortOption,
+    maxPrice,
+    minRating,
+    selectedTags,
+  ];
 }
 
 class SearchInitial extends SearchState {
@@ -27,6 +38,8 @@ class SearchInitial extends SearchState {
     super.selectedCategory,
     super.sortOption,
     super.maxPrice,
+    super.minRating,
+    super.selectedTags,
   });
 }
 
@@ -36,6 +49,8 @@ class SearchLoading extends SearchState {
     required super.selectedCategory,
     required super.sortOption,
     required super.maxPrice,
+    super.minRating,
+    super.selectedTags,
   });
 }
 
@@ -50,6 +65,8 @@ class SearchSuccess extends SearchState {
     required super.selectedCategory,
     required super.sortOption,
     required super.maxPrice,
+    super.minRating,
+    super.selectedTags,
   });
 
   @override
@@ -60,6 +77,8 @@ class SearchSuccess extends SearchState {
     selectedCategory,
     sortOption,
     maxPrice,
+    minRating,
+    selectedTags,
   ];
 }
 
@@ -69,6 +88,8 @@ class SearchEmpty extends SearchState {
     required super.selectedCategory,
     required super.sortOption,
     required super.maxPrice,
+    super.minRating,
+    super.selectedTags,
   });
 }
 
@@ -81,6 +102,8 @@ class SearchError extends SearchState {
     required super.selectedCategory,
     required super.sortOption,
     required super.maxPrice,
+    super.minRating,
+    super.selectedTags,
   });
 
   @override
@@ -90,5 +113,7 @@ class SearchError extends SearchState {
     selectedCategory,
     sortOption,
     maxPrice,
+    minRating,
+    selectedTags,
   ];
 }

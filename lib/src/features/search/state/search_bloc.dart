@@ -70,12 +70,16 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     final newCategory = event.category ?? state.selectedCategory;
     final newSort = event.sortOption ?? state.sortOption;
     final newMaxPrice = event.maxPrice ?? state.maxPrice;
+    final newMinRating = event.minRating ?? state.minRating;
+    final newTags = event.selectedTags ?? state.selectedTags;
 
     _applyFiltersAndEmit(
       emit,
       category: newCategory,
       sort: newSort,
       maxPrice: newMaxPrice,
+      minRating: newMinRating,
+      selectedTags: newTags,
     );
   }
 
@@ -85,6 +89,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       category: RecipeCategory.all,
       sort: SortOption.relevance,
       maxPrice: 500.0,
+      minRating: 0.0,
+      selectedTags: const {},
     );
   }
 
@@ -93,10 +99,14 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     RecipeCategory? category,
     SortOption? sort,
     double? maxPrice,
+    double? minRating,
+    Set<String>? selectedTags,
   }) {
     final cat = category ?? state.selectedCategory;
     final s = sort ?? state.sortOption;
     final priceCap = maxPrice ?? state.maxPrice;
+    final minStars = minRating ?? state.minRating;
+    final tags = selectedTags ?? state.selectedTags;
 
     // 1. Filter by category
     var list = cat == RecipeCategory.all
@@ -111,10 +121,27 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
               )
               .toList();
 
-    // 2. Filter by max price
+    // 2. Filter by subcategory tags (if any selected)
+    if (tags.isNotEmpty) {
+      list = list.where((r) {
+        final lowerTags = r.tags.map((t) => t.toLowerCase()).toList();
+        final lowerName = r.name.toLowerCase();
+        return tags.any((tag) {
+          final t = tag.toLowerCase();
+          return lowerName.contains(t) || lowerTags.any((lt) => lt.contains(t));
+        });
+      }).toList();
+    }
+
+    // 3. Filter by min rating
+    if (minStars > 0) {
+      list = list.where((r) => r.rating >= minStars).toList();
+    }
+
+    // 4. Filter by max price
     list = list.where((r) => r.price <= priceCap).toList();
 
-    // 3. Sort
+    // 5. Sort
     final sorted = List<RecipeEntity>.from(list);
     switch (s) {
       case SortOption.ratingHighToLow:
@@ -140,6 +167,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
           selectedCategory: cat,
           sortOption: s,
           maxPrice: priceCap,
+          minRating: minStars,
+          selectedTags: tags,
         ),
       );
     } else {
@@ -151,6 +180,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
           selectedCategory: cat,
           sortOption: s,
           maxPrice: priceCap,
+          minRating: minStars,
+          selectedTags: tags,
         ),
       );
     }

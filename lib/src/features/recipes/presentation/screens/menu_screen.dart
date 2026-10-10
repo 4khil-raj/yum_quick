@@ -60,176 +60,6 @@ class _MenuScreenState extends State<MenuScreen> {
     });
   }
 
-  void _showFilterBottomSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      builder: (bottomSheetContext) {
-        return BlocBuilder<SearchBloc, SearchState>(
-          builder: (context, searchState) {
-            var selectedSort = searchState.sortOption;
-            var maxPrice = searchState.maxPrice;
-            var selectedCat = searchState.selectedCategory;
-
-            return StatefulBuilder(
-              builder: (context, setModalState) {
-                return Padding(
-                  padding: EdgeInsets.only(
-                    left: 24,
-                    right: 24,
-                    top: 20,
-                    bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Center(
-                        child: Container(
-                          width: 44,
-                          height: 5,
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade300,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 18),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Filters & Sorting',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              context.read<SearchBloc>().add(
-                                const ClearFiltersReq(),
-                              );
-                              Navigator.pop(context);
-                            },
-                            child: const Text(
-                              'Reset',
-                              style: TextStyle(color: AppColors.primaryOrange),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Sort options
-                      const Text(
-                        'Sort By',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: SortOption.values.map((sort) {
-                          final isSelected = selectedSort == sort;
-                          return ChoiceChip(
-                            label: Text(sort.label),
-                            selected: isSelected,
-                            selectedColor: AppColors.chipOrangeTint,
-                            onSelected: (selected) {
-                              if (selected) {
-                                setModalState(() => selectedSort = sort);
-                              }
-                            },
-                          );
-                        }).toList(),
-                      ),
-                      const SizedBox(height: 20),
-
-                      // Price range slider
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Maximum Price',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          Text(
-                            '₹${maxPrice.toInt()}',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.primaryOrange,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Slider(
-                        value: maxPrice,
-                        min: 99.0,
-                        max: 500.0,
-                        divisions: 8,
-                        activeColor: AppColors.primaryOrange,
-                        inactiveColor: AppColors.chipOrangeTint,
-                        onChanged: (val) {
-                          setModalState(() => maxPrice = val);
-                        },
-                      ),
-                      const SizedBox(height: 24),
-
-                      // Apply button
-                      SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            context.read<SearchBloc>().add(
-                              UpdateFilterReq(
-                                category: selectedCat,
-                                sortOption: selectedSort,
-                                maxPrice: maxPrice,
-                              ),
-                            );
-                            Navigator.pop(context);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primaryOrange,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                          ),
-                          child: const Text(
-                            'Apply Filters',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            );
-          },
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -304,7 +134,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 ),
                 const SizedBox(width: 10),
                 GestureDetector(
-                  onTap: () => _showFilterBottomSheet(context),
+                  onTap: () => context.push('/menu/filter'),
                   child: Container(
                     width: 48,
                     height: 48,
@@ -313,10 +143,10 @@ class _MenuScreenState extends State<MenuScreen> {
                       borderRadius: BorderRadius.circular(16),
                     ),
                     padding: const EdgeInsets.all(12),
-                    child: Image.asset(
-                      AppAssets.icSettings,
+                    child: const Icon(
+                      Icons.tune_rounded,
                       color: Colors.white,
-                      fit: BoxFit.contain,
+                      size: 24,
                     ),
                   ),
                 ),
