@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yum_quick/src/core/constants/app_assets.dart';
 import 'package:yum_quick/src/core/constants/app_colors.dart';
-import 'package:yum_quick/src/core/presentation/components/app_button.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -10,79 +9,94 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.primaryOrange,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-          child: Column(
-            children: [
-              const Spacer(flex: 1),
-              // Brand Logo & Illustration
-              Center(
-                child: Image.asset(
-                  AppAssets.logoOrange,
-                  width: 220,
+        child: Center(
+          child: SingleChildScrollView(
+            physics: const ClampingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(height: 20),
+
+                // Yellow YumQuick Logo
+                Image.asset(
+                  AppAssets.logoYellow,
+                  width: 210,
                   fit: BoxFit.contain,
                 ),
-              ),
-              const SizedBox(height: 24),
-              // Hero Image
-              ClipRRect(
-                borderRadius: BorderRadius.circular(28),
-                child: Image.asset(
-                  AppAssets.imgOnboardingPizza,
-                  height: 240,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              const SizedBox(height: 32),
-              const Text(
-                'Delicious Food at Your Fingertips',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.textPrimary,
-                  height: 1.25,
-                ),
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                'Explore recipes, customize meals, and get superfast delivery with YumQuick.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: AppColors.textMuted,
-                  height: 1.4,
-                ),
-              ),
-              const Spacer(flex: 2),
-              // Action Buttons
-              AppButton(
-                text: 'Sign In',
-                onPressed: () => context.push('/login'),
-              ),
-              const SizedBox(height: 12),
-              AppButton(
-                text: 'Get Started (Onboarding)',
-                variant: AppButtonVariant.secondary,
-                onPressed: () => context.push('/onboarding'),
-              ),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: () => context.go('/home'),
-                child: const Text(
-                  'Continue as Guest',
+                const SizedBox(height: 24),
+
+                // Description Subtitle
+                const Text(
+                  'Lorem ipsum dolor sit amet, consectetur\nadipiscing elit, sed do eiusmod.',
+                  textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textSecondary,
+                    fontSize: 13,
+                    height: 1.5,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
-              ),
-              const SizedBox(height: 12),
-            ],
+                const SizedBox(height: 48),
+
+                // Log In Button (Yellow Pill)
+                SizedBox(
+                  width: 220,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: () => context.push('/login'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryYellow,
+                      foregroundColor: AppColors.primaryOrange,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                    ),
+                    child: const Text(
+                      'Log In',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.primaryOrange,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Sign Up Button (Cream Pill)
+                SizedBox(
+                  width: 220,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: () => context.push('/signup'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.creamButton,
+                      foregroundColor: AppColors.primaryOrange,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                    ),
+                    child: const Text(
+                      'Sign Up',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.primaryOrange,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),

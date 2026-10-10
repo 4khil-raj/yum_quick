@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yum_quick/src/core/constants/app_assets.dart';
 import 'package:yum_quick/src/core/constants/app_colors.dart';
-import 'package:yum_quick/src/core/presentation/components/app_button.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -18,18 +17,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final List<Map<String, String>> _slides = [
     {
       'image': AppAssets.imgOnboardingPizza,
+      'icon': AppAssets.icOrders,
       'title': 'Order For Food',
-      'subtitle': 'Browse thousands of recipes and restaurant favorites delivered straight to your doorstep.',
+      'subtitle': 'Lorem ipsum dolor sit amet, conse ctetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.',
     },
     {
       'image': AppAssets.imgOnboardingBrownie,
+      'icon': AppAssets.icPayment,
       'title': 'Easy Payment',
-      'subtitle': 'Pay seamlessly and securely with UPI, cards, net banking, or cash on delivery.',
+      'subtitle': 'Lorem ipsum dolor sit amet, conse ctetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.',
     },
     {
       'image': AppAssets.imgOnboardingCoffee,
+      'icon': AppAssets.icDelivery,
       'title': 'Fast Delivery',
-      'subtitle': 'Lightning-fast delivery with live tracking so you know exactly when your meal arrives.',
+      'subtitle': 'Lorem ipsum dolor sit amet, conse ctetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.',
     },
   ];
 
@@ -40,8 +42,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         curve: Curves.easeInOut,
       );
     } else {
-      context.go('/login');
+      context.go('/welcome');
     }
+  }
+
+  void _onSkip() {
+    context.go('/welcome');
   }
 
   @override
@@ -53,112 +59,224 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        actions: [
-          TextButton(
-            onPressed: () => context.go('/login'),
-            child: const Text(
-              'Skip',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: PageView.builder(
-                controller: _pageController,
-                itemCount: _slides.length,
-                onPageChanged: (index) {
-                  setState(() => _currentIndex = index);
-                },
-                itemBuilder: (context, index) {
-                  final slide = _slides[index];
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(28),
-                          child: Image.asset(
-                            slide['image']!,
-                            height: 280,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        const SizedBox(height: 36),
-                        Text(
-                          slide['title']!,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                        Text(
-                          slide['subtitle']!,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 15,
-                            color: AppColors.textMuted,
-                            height: 1.45,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
+      backgroundColor: Colors.white,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final topHeight = constraints.maxHeight * 0.54;
 
-            // Indicator & Next Button
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(
-                      _slides.length,
-                      (index) => AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        height: 8,
-                        width: _currentIndex == index ? 24 : 8,
-                        decoration: BoxDecoration(
-                          color: _currentIndex == index
-                              ? AppColors.primaryOrange
-                              : AppColors.chipOrangeTint,
-                          borderRadius: BorderRadius.circular(4),
+          return Stack(
+            children: [
+              // 1. Food Hero Photos PageView (Upper 54%)
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                height: topHeight,
+                child: PageView.builder(
+                  controller: _pageController,
+                  itemCount: _slides.length,
+                  onPageChanged: (index) {
+                    setState(() => _currentIndex = index);
+                  },
+                  itemBuilder: (context, index) {
+                    return Image.asset(
+                      _slides[index]['image']!,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
+                    );
+                  },
+                ),
+              ),
+
+              // 2. Yellow Status Bar + Skip Button
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: Container(
+                  color: AppColors.primaryYellow.withValues(alpha: 0.92),
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).padding.top,
+                    left: 16,
+                    right: 16,
+                    bottom: 8,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      GestureDetector(
+                        onTap: _onSkip,
+                        behavior: HitTestBehavior.opaque,
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Skip',
+                                style: TextStyle(
+                                  color: AppColors.primaryOrange,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              SizedBox(width: 4),
+                              Icon(
+                                Icons.chevron_right_rounded,
+                                size: 18,
+                                color: AppColors.primaryOrange,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // 3. Bottom White Sheet with Curved Top
+              Positioned(
+                top: topHeight - 28,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(32),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 16,
+                        offset: Offset(0, -4),
+                      ),
+                    ],
+                  ),
+                  child: SafeArea(
+                    top: false,
+                    child: SingleChildScrollView(
+                      physics: const ClampingScrollPhysics(),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 28,
+                          vertical: 24,
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Outlined Orange Icon
+                            Container(
+                              width: 52,
+                              height: 52,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: AppColors.primaryOrange,
+                                  width: 2,
+                                ),
+                              ),
+                              padding: const EdgeInsets.all(11),
+                              child: Image.asset(
+                                _slides[_currentIndex]['icon']!,
+                                color: AppColors.primaryOrange,
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                            const SizedBox(height: 14),
+
+                            // Bold Orange Title
+                            Text(
+                              _slides[_currentIndex]['title']!,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.primaryOrange,
+                                letterSpacing: 0.2,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+
+                            // Subtitle description
+                            Text(
+                              _slides[_currentIndex]['subtitle']!,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 13,
+                                height: 1.45,
+                                color: AppColors.textPrimary.withValues(
+                                  alpha: 0.75,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 22),
+
+                            // Dash / Pill Page Indicators
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: List.generate(_slides.length, (index) {
+                                final isActive = _currentIndex == index;
+                                return AnimatedContainer(
+                                  duration: const Duration(milliseconds: 250),
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 4,
+                                  ),
+                                  height: 5,
+                                  width: isActive ? 24 : 14,
+                                  decoration: BoxDecoration(
+                                    color: isActive
+                                        ? AppColors.primaryOrange
+                                        : AppColors.inactiveDot,
+                                    borderRadius: BorderRadius.circular(3),
+                                  ),
+                                );
+                              }),
+                            ),
+                            const SizedBox(height: 22),
+
+                            // Centered Orange Pill Button
+                            SizedBox(
+                              width: 180,
+                              height: 48,
+                              child: ElevatedButton(
+                                onPressed: _onNext,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primaryOrange,
+                                  foregroundColor: Colors.white,
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(24),
+                                  ),
+                                ),
+                                child: Text(
+                                  _currentIndex == _slides.length - 1
+                                      ? 'Get Started'
+                                      : 'Next',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 28),
-                  AppButton(
-                    text: _currentIndex == _slides.length - 1
-                        ? 'Get Started'
-                        : 'Next',
-                    onPressed: _onNext,
-                  ),
-                ],
+                ),
               ),
-            ),
-          ],
-        ),
+            ],
+          );
+        },
       ),
     );
   }

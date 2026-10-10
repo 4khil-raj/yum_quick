@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yum_quick/src/core/constants/app_assets.dart';
 import 'package:yum_quick/src/core/constants/app_colors.dart';
-import 'package:yum_quick/src/core/presentation/components/curved_header.dart';
 
 import '../../../auth/state/auth_bloc.dart';
 import '../../../auth/state/auth_event.dart';
@@ -15,278 +14,258 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
-      body: BlocBuilder<AuthBloc, AuthState>(
-        builder: (context, state) {
-          final user = state is Authenticated ? state.user : null;
-          final isBiometricEnabled = state is Authenticated
-              ? state.isBiometricEnabled
-              : false;
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) {
+        final user = state is Authenticated ? state.user : null;
+        final displayName = user != null && user.fullName.isNotEmpty
+            ? user.fullName
+            : 'John Smith';
+        final displayEmail = user != null && user.email.isNotEmpty
+            ? user.email
+            : 'Loremipsum@email.com';
 
-          return Column(
-            children: [
-              CurvedHeader(
-                title: const Text(
-                  'My Profile',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 20,
-                  ),
-                  child: Column(
-                    children: [
-                      // User Avatar & Name Card
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(24),
-                          border: Border.all(color: AppColors.border),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: AppColors.shadow,
-                              blurRadius: 10,
-                              offset: Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 36,
-                              backgroundColor: AppColors.chipOrangeTint,
-                              backgroundImage: user?.image != null
-                                  ? CachedNetworkImageProvider(user!.image!)
-                                  : null,
-                              child: user?.image == null
-                                  ? const Icon(
-                                      Icons.person,
-                                      size: 40,
-                                      color: AppColors.primaryOrange,
-                                    )
-                                  : null,
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    user?.fullName.isNotEmpty == true
-                                        ? user!.fullName
-                                        : 'Emily Smith',
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w800,
-                                      color: AppColors.textPrimary,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    user?.email.isNotEmpty == true
-                                        ? user!.email
-                                        : 'emily@example.com',
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      color: AppColors.textMuted,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    '@${user?.username ?? 'emilys'}',
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.primaryOrange,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
+        return Scaffold(
+          backgroundColor: AppColors.primaryYellow,
+          body: SafeArea(
+            bottom: false,
+            child: Column(
+              children: [
+                // Curved Orange Side-Drawer Styled Container
+                Expanded(
+                  child: Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(left: 40),
+                    decoration: const BoxDecoration(
+                      color: AppColors.primaryOrange,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(44),
+                        bottomLeft: Radius.circular(24),
                       ),
-                      const SizedBox(height: 24),
-
-                      // Settings Options Group
-                      _buildSettingsGroup([
-                        _buildSettingsTile(
-                          icon: AppAssets.icFingerprint,
-                          title: 'Biometric Unlock',
-                          trailing: Switch(
-                            value: isBiometricEnabled,
-                            activeThumbColor: AppColors.primaryOrange,
-                            onChanged: (val) {
-                              context.read<AuthBloc>().add(
-                                EnableBiometricReq(val),
-                              );
-                            },
-                          ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 16,
+                          offset: Offset(-4, 0),
                         ),
-                        _buildSettingsTile(
-                          icon: AppAssets.icOrders,
-                          title: 'My Orders',
-                          onTap: () => context.go('/orders'),
-                        ),
-                        _buildSettingsTile(
-                          icon: AppAssets.icLocation,
-                          title: 'Delivery Addresses',
-                          onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Delivery address saved.'),
-                              ),
-                            );
-                          },
-                        ),
-                        _buildSettingsTile(
-                          icon: AppAssets.icPayment,
-                          title: 'Payment Methods',
-                          onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Manage UPI & Cards'),
-                              ),
-                            );
-                          },
-                        ),
-                        _buildSettingsTile(
-                          icon: AppAssets.icSupport,
-                          title: 'Help & Customer Support',
-                          onTap: () => context.push('/support'),
-                        ),
-                        _buildSettingsTile(
-                          icon: AppAssets.icInfo,
-                          title: 'About YumQuick',
-                          subtitle:
-                              'Version 1.0.0 • Bictree Technical Assignment',
-                          onTap: () {},
-                        ),
-                      ]),
-                      const SizedBox(height: 24),
-
-                      // Logout Button
-                      InkWell(
-                        onTap: () {
-                          context.read<AuthBloc>().add(const LogoutReq());
-                          context.go('/login');
-                        },
-                        borderRadius: BorderRadius.circular(20),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          decoration: BoxDecoration(
-                            color: AppColors.error.withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: AppColors.error.withValues(alpha: 0.3),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                      ],
+                    ),
+                    child: SingleChildScrollView(
+                      physics: const ClampingScrollPhysics(),
+                      padding: const EdgeInsets.only(
+                        left: 28,
+                        right: 24,
+                        top: 36,
+                        bottom: 40,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // User Avatar + Name + Email
+                          Row(
                             children: [
-                              Image.asset(
-                                AppAssets.icLogout,
-                                width: 20,
-                                height: 20,
-                                color: AppColors.error,
+                              CircleAvatar(
+                                radius: 28,
+                                backgroundColor: Colors.white24,
+                                backgroundImage: user?.image != null
+                                    ? CachedNetworkImageProvider(user!.image!)
+                                    : null,
+                                child: user?.image == null
+                                    ? const Icon(
+                                        Icons.person,
+                                        size: 32,
+                                        color: Colors.white,
+                                      )
+                                    : null,
                               ),
-                              const SizedBox(width: 8),
-                              const Text(
-                                'Sign Out',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.error,
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      displayName,
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w800,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      displayEmail,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.white70,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
                           ),
-                        ),
+                          const SizedBox(height: 32),
+
+                          // 1. My Orders
+                          _buildMenuItem(
+                            iconPath: AppAssets.icOrders,
+                            title: 'My Orders',
+                            onTap: () => context.go('/orders'),
+                          ),
+
+                          // 2. My Profile
+                          _buildMenuItem(
+                            iconPath: AppAssets.icProfile,
+                            title: 'My Profile',
+                            onTap: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Profile details are up to date.',
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+
+                          // 3. Delivery Address
+                          _buildMenuItem(
+                            iconPath: AppAssets.icLocation,
+                            title: 'Delivery Address',
+                            onTap: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Delivery address saved.'),
+                                ),
+                              );
+                            },
+                          ),
+
+                          // 4. Payment Methods
+                          _buildMenuItem(
+                            iconPath: AppAssets.icPayment,
+                            title: 'Payment Methods',
+                            onTap: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Payment methods configured.'),
+                                ),
+                              );
+                            },
+                          ),
+
+                          // 5. Contact Us
+                          _buildMenuItem(
+                            iconPath: AppAssets.icSupport,
+                            title: 'Contact Us',
+                            onTap: () => context.push('/support'),
+                          ),
+
+                          // 6. Help & FAQs
+                          _buildMenuItem(
+                            iconPath: AppAssets.icInfo,
+                            title: 'Help & FAQs',
+                            onTap: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Help Center: support@yumquick.com',
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+
+                          // 7. Settings
+                          _buildMenuItem(
+                            iconPath: AppAssets.icSettings,
+                            title: 'Settings',
+                            onTap: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'App version 1.0.0 (Bictree Submission)',
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+
+                          // 8. Log Out
+                          _buildMenuItem(
+                            iconPath: AppAssets.icLogout,
+                            title: 'Log Out',
+                            onTap: () {
+                              context.read<AuthBloc>().add(const LogoutReq());
+                              context.go('/welcome');
+                            },
+                            showDivider: false,
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 24),
-                    ],
+                    ),
                   ),
                 ),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildSettingsGroup(List<Widget> children) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.border),
-        boxShadow: const [
-          BoxShadow(
-            color: AppColors.shadow,
-            blurRadius: 8,
-            offset: Offset(0, 3),
+              ],
+            ),
           ),
-        ],
-      ),
-      child: Column(children: children),
+        );
+      },
     );
   }
 
-  Widget _buildSettingsTile({
-    required String icon,
+  Widget _buildMenuItem({
+    required String iconPath,
     required String title,
-    String? subtitle,
-    Widget? trailing,
-    VoidCallback? onTap,
+    required VoidCallback onTap,
+    bool showDivider = true,
   }) {
-    return ListTile(
-      leading: Container(
-        width: 38,
-        height: 38,
-        decoration: const BoxDecoration(
-          color: AppColors.surfaceSoft,
-          shape: BoxShape.circle,
-        ),
-        padding: const EdgeInsets.all(9),
-        child: Image.asset(
-          icon,
-          color: AppColors.primaryOrange,
-          fit: BoxFit.contain,
-        ),
-      ),
-      title: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w700,
-          color: AppColors.textPrimary,
-        ),
-      ),
-      subtitle: subtitle != null
-          ? Text(
-              subtitle,
-              style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
-            )
-          : null,
-      trailing:
-          trailing ??
-          Image.asset(
-            AppAssets.icChevronRight,
-            width: 14,
-            height: 14,
-            color: AppColors.textSecondary,
+    return Column(
+      children: [
+        InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: Row(
+              children: [
+                // White Circle Icon with Orange Glyph
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  padding: const EdgeInsets.all(9),
+                  child: Image.asset(
+                    iconPath,
+                    color: AppColors.primaryOrange,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-      onTap: onTap,
+        ),
+        if (showDivider)
+          Container(
+            margin: const EdgeInsets.only(left: 54, top: 4, bottom: 4),
+            height: 1,
+            color: Colors.white.withValues(alpha: 0.2),
+          ),
+      ],
     );
   }
 }

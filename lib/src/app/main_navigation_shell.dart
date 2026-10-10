@@ -26,30 +26,38 @@ class MainNavigationShell extends StatelessWidget {
 
     return Scaffold(
       body: navigationShell,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: BlocBuilder<CartBloc, CartState>(
         builder: (context, state) {
           if (state is CartLoaded && state.totalItemCount > 0) {
-            return FloatingActionButton.extended(
-              onPressed: () => context.push('/cart'),
-              backgroundColor: AppColors.primaryOrange,
-              elevation: 6,
-              icon: Badge(
-                label: Text('${state.totalItemCount}'),
+            return Container(
+              margin: const EdgeInsets.only(bottom: 74),
+              child: FloatingActionButton.extended(
+                onPressed: () => context.push('/cart'),
                 backgroundColor: AppColors.primaryYellow,
-                textColor: AppColors.textPrimary,
-                child: Image.asset(
-                  AppAssets.icCart,
-                  width: 22,
-                  height: 22,
-                  color: Colors.white,
+                foregroundColor: AppColors.textPrimary,
+                elevation: 6,
+                icon: Badge(
+                  label: Text(
+                    '${state.totalItemCount}',
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  backgroundColor: AppColors.primaryOrange,
+                  textColor: Colors.white,
+                  child: Image.asset(
+                    AppAssets.icCart,
+                    width: 22,
+                    height: 22,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
-              ),
-              label: Text(
-                'View Cart • ${PricingCalculator.formatINR(state.total)}',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 14,
+                label: Text(
+                  'Cart • ${PricingCalculator.formatINR(state.total)}',
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 14,
+                  ),
                 ),
               ),
             );
@@ -59,50 +67,51 @@ class MainNavigationShell extends StatelessWidget {
       ),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
-          color: Colors.white,
+          color: AppColors.primaryOrange,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           boxShadow: [
             BoxShadow(
-              color: AppColors.shadow,
-              blurRadius: 16,
-              offset: Offset(0, -4),
+              color: Colors.black12,
+              blurRadius: 10,
+              offset: Offset(0, -2),
             ),
           ],
         ),
         child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          top: false,
+          child: SizedBox(
+            height: 64,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildNavItem(
                   index: 0,
                   currentIndex: currentIndex,
-                  iconPath: AppAssets.icKnifeFork,
-                  label: 'Home',
+                  icon: const Icon(
+                    Icons.home_outlined,
+                    color: Colors.white,
+                    size: 26,
+                  ),
                 ),
                 _buildNavItem(
                   index: 1,
                   currentIndex: currentIndex,
-                  iconPath: AppAssets.icSnacks,
-                  label: 'Menu',
+                  assetPath: AppAssets.icDineIn,
                 ),
                 _buildNavItem(
                   index: 2,
                   currentIndex: currentIndex,
-                  iconPath: AppAssets.icFavorite,
-                  label: 'Favorites',
+                  assetPath: AppAssets.icFavorite,
                 ),
                 _buildNavItem(
                   index: 3,
                   currentIndex: currentIndex,
-                  iconPath: AppAssets.icOrders,
-                  label: 'Orders',
+                  assetPath: AppAssets.icOrders,
                 ),
                 _buildNavItem(
                   index: 4,
                   currentIndex: currentIndex,
-                  iconPath: AppAssets.icProfile,
-                  label: 'Profile',
+                  assetPath: AppAssets.icHeadset,
                 ),
               ],
             ),
@@ -115,43 +124,47 @@ class MainNavigationShell extends StatelessWidget {
   Widget _buildNavItem({
     required int index,
     required int currentIndex,
-    required String iconPath,
-    required String label,
+    String? assetPath,
+    Widget? icon,
   }) {
     final isSelected = index == currentIndex;
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () => _onItemTapped(index),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.chipOrangeTint.withValues(alpha: 0.6)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-        ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image.asset(
-              iconPath,
-              width: 22,
-              height: 22,
-              color: isSelected ? AppColors.primaryOrange : AppColors.textMuted,
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: isSelected
+                  ? BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.22),
+                      shape: BoxShape.circle,
+                    )
+                  : null,
+              child:
+                  icon ??
+                  Image.asset(
+                    assetPath!,
+                    width: 24,
+                    height: 24,
+                    color: Colors.white,
+                  ),
             ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
-                color: isSelected
-                    ? AppColors.primaryOrange
-                    : AppColors.textMuted,
+            if (isSelected)
+              Container(
+                margin: const EdgeInsets.only(top: 2),
+                width: 4,
+                height: 4,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
               ),
-            ),
           ],
         ),
       ),

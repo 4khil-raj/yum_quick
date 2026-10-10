@@ -29,6 +29,9 @@ class AppColors {
   ); // Category selected / discount tint
   static const Color chipYellowTint = Color(0xFFFCE9A6);
   static const Color yellowLight = Color(0xFFFFF3CD);
+  static const Color creamButton = Color(0xFFF8ECC0);
+  static const Color creamCard = Color(0xFFFDF1CC);
+  static const Color inactiveDot = Color(0xFFF8ECC0);
 
   // Typography
   static const Color textPrimary = Color(0xFF3E1B0E); // Deep warm brown
