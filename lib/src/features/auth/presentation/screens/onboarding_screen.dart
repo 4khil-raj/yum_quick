@@ -17,7 +17,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final List<Map<String, String>> _slides = [
     {
       'image': AppAssets.imgOnboardingPizza,
-      'icon': AppAssets.icOrders,
+      'icon': AppAssets.icOrderFood,
       'title': 'Order For Food',
       'subtitle': 'Lorem ipsum dolor sit amet, conse ctetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.',
     },
@@ -172,20 +172,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             // Outlined Orange Icon
-                            Container(
-                              width: 52,
-                              height: 52,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: AppColors.primaryOrange,
-                                  width: 2,
-                                ),
-                              ),
-                              padding: const EdgeInsets.all(11),
+                            SizedBox(
+                              width: 48,
+                              height: 48,
                               child: Image.asset(
                                 _slides[_currentIndex]['icon']!,
-                                color: AppColors.primaryOrange,
                                 fit: BoxFit.contain,
                               ),
                             ),

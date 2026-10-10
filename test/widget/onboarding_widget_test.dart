@@ -11,11 +11,7 @@ void main() {
     tester.view.physicalSize = const Size(1080, 1920);
     tester.view.devicePixelRatio = 2.625;
 
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: OnboardingScreen(),
-      ),
-    );
+    await tester.pumpWidget(const MaterialApp(home: OnboardingScreen()));
 
     await tester.pumpAndSettle();
 
@@ -43,11 +39,7 @@ void main() {
   testWidgets('WelcomeScreen renders yellow logo and action buttons', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: WelcomeScreen(),
-      ),
-    );
+    await tester.pumpWidget(const MaterialApp(home: WelcomeScreen()));
 
     await tester.pumpAndSettle();
 

@@ -655,11 +655,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                   shape: BoxShape.circle,
                 ),
                 padding: const EdgeInsets.all(22),
-                child: Image.asset(
-                  AppAssets.icOrders,
-                  color: AppColors.primaryOrange,
-                  fit: BoxFit.contain,
-                ),
+                child: Image.asset(AppAssets.icOrderFood, fit: BoxFit.contain),
               ),
               const SizedBox(height: 24),
               const Text(

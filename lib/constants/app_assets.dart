@@ -6,6 +6,7 @@ class AppAssets {
   static const String logoYellow = 'assets/logos/yum_quick_logo_yellow.png';
 
   // Service & Food Categories
+  static const String icOrderFood = 'assets/icons/ic_order_food.png';
   static const String icDelivery = 'assets/icons/ic_delivery.png';
   static const String icTakeaway = 'assets/icons/ic_takeaway.png';
   static const String icDineIn = 'assets/icons/ic_dine_in.png';
