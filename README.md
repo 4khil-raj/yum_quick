@@ -105,51 +105,68 @@ DummyJSON categorizes recipes using `mealType` and `tags`. The app implements a 
 
 ## 🏗️ Architecture & Folder Structure
 
-Follows **Feature-Based Clean Architecture** with strict dependency direction:  
-`UI (Widgets)` → `BLoC (Events/States)` → `Repository` → `Data Sources` → `API / Hive / SecureStorage`
+Follows **Consistent Feature-First Clean Architecture** with strict layer boundaries:  
+`UI (Screens & Widgets)` → `BLoC (Events/States in presentation/bloc/)` → `Repository Contracts (domain/)` → `Repository Implementations (data/)` → `Data Sources (Remote Dio / Local Hive & SecureStorage)`
 
 ```
 lib/
 ├── main.dart
 ├── constants/
-│   └── app_assets.dart
+│   └── app_assets.dart                # Backward-compatible export
 └── src/
     ├── app/
-    │   ├── app.dart                   # MultiBlocProvider & MaterialApp.router
-    │   ├── router.dart                # GoRouter with StatefulShellRoute
+    │   ├── app.dart                   # Root MultiBlocProvider & MaterialApp.router
+    │   ├── router.dart                # GoRouter with redirect guards & routes
     │   └── main_navigation_shell.dart # Curved bottom navigation shell
     ├── core/
-    │   ├── connectivity/              # ConnectivityService with connectivity_plus
-    │   ├── constants/                 # AppColors, ApiConstants, AppAssets export
-    │   ├── di/                        # ServiceLocator central composition root
-    │   ├── errors/                    # Failure & Exception classes
-    │   ├── network/                   # DioClient with Bearer & 401 interceptor
-    │   ├── storage/                   # SecureStorageService & HiveStorageService
+    │   ├── connectivity/              # ConnectivityService with connectivity_plus stream
+    │   ├── constants/                 # AppColors, ApiConstants, AppAssets
+    │   ├── errors/                    # Failure & Exception hierarchies
+    │   ├── network/                   # DioClient with Bearer injection & safe 401 callback
+    │   ├── storage/                   # SecureStorageService & HiveStorageService (5 boxes)
     │   ├── theme/                     # Material 3 light theme & typography
-    │   ├── utils/                     # PricingCalculator & CategoryMapper
+    │   ├── utils/                     # PricingCalculator, CategoryMapper, AppSnackbar
     │   └── presentation/components/   # AppButton, AppTextField, CurvedHeader, FoodCard, etc.
     └── features/
-        ├── auth/                      # Login, Signup, Biometrics, UserEntity, AuthBloc
-        ├── recipes/                   # Home, Menu, Detail, BestSeller, RecipeBloc
-        ├── cart/                      # CartItemEntity, CartBloc, CartScreen, Checkout
-        ├── search/                    # SearchBloc, filters, sort options
-        ├── orders/                    # OrderEntity, OrdersBloc, LiveTracking, Cancellation
-        ├── profile/                   # User profile, Biometrics toggle, Sign-out
-        └── support/                   # Interactive 24/7 customer support chat
+        ├── auth/
+        │   ├── data/                  # AuthRemoteDataSource, AuthLocalDataSource, UserModel, AuthRepositoryImpl
+        │   ├── domain/                # UserEntity, AuthRepository contract
+        │   └── presentation/          # LoginScreen, OnboardingScreen, SignupScreen, SplashScreen, AuthBloc
+        │       └── bloc/              # auth_bloc.dart, auth_event.dart, auth_state.dart
+        ├── recipes/
+        │   ├── data/                  # RecipeRemoteDataSource, RecipeLocalDataSource, RecipeModel, RecipeRepositoryImpl
+        │   ├── domain/                # RecipeEntity, RecipeRepository contract
+        │   └── presentation/          # HomeScreen, MenuScreen, RecipeDetailScreen, FavoritesScreen, RecipeBloc
+        │       └── bloc/              # recipe_bloc.dart, recipe_event.dart, recipe_state.dart
+        ├── cart/
+        │   ├── data/                  # CartLocalDataSource, CartRepositoryImpl
+        │   ├── domain/                # CartItemEntity, CartRepository contract
+        │   └── presentation/          # CartScreen, CheckoutScreen, OrderConfirmedScreen, CartBloc
+        │       └── bloc/              # cart_bloc.dart, cart_event.dart, cart_state.dart
+        ├── search/
+        │   └── presentation/          # FilterScreen, SearchBloc
+        │       └── bloc/              # search_bloc.dart, search_event.dart, search_state.dart
+        ├── orders/
+        │   ├── data/                  # OrdersLocalDataSource (Hive), OrderModel, OrdersRepositoryImpl
+        │   ├── domain/                # OrderEntity, OrdersRepository contract
+        │   └── presentation/          # OrdersScreen, LiveTrackingScreen, OrdersBloc
+        │       └── bloc/              # orders_bloc.dart, orders_event.dart, orders_state.dart
+        └── profile/
+            └── presentation/          # ProfileScreen with sign-out, stats, and profile options
 ```
 
-### State Management
-- Utilizes **Flutter BLoC** (`flutter_bloc` 9.1.1).
-- Every feature maintains separate `_bloc.dart`, `_event.dart`, and `_state.dart` files.
-- Uses Dart 3 `sealed class` hierarchies for events (`FetchRecipesReq`, `AddToCartReq`, `LoginReq`, etc.) and states (`RecipeLoading`, `RecipeSuccess`, `CartLoaded`, etc.).
-- Explicit loading, success, empty, and error states.
-- Separation of pagination errors from list state to prevent data erasure during failed subsequent page requests.
+### State Management & Layer Boundaries
+- Grouped all BLoCs under `presentation/bloc/` consistently across all features.
+- Zero business logic inside widgets: pricing calculations are pure domain rules in `PricingCalculator`.
+- Zero direct HTTP or database calls in BLoCs: all persistence flows through abstract Repository contracts.
+- Credential security: `accessToken` and `refreshToken` are stored exclusively in hardware-backed `FlutterSecureStorage` (never in unencrypted Hive).
+- Orders persistence: `OrdersBloc` uses `OrdersRepository` backed by `OrdersLocalDataSource` with Hive `orders_box`. Orders persist across app restarts and updates.
 
 ---
 
 ## 🧪 Testing
 
-The project includes unit and widget tests covering calculations, mock repository fallback, and UI interactions:
+The project includes unit and widget tests covering calculations, mock repository fallback, BLoC state transitions, and UI interactions:
 
 1. **`test/unit/cart_pricing_test.dart`**:
    - Deterministic recipe price bounds (₹99 – ₹499).
@@ -168,16 +185,43 @@ The project includes unit and widget tests covering calculations, mock repositor
    - Tests error mapping to `ServerFailure`.
    - Tests category filtering logic.
 
-3. **`test/widget/login_form_widget_test.dart`**:
-   - Tests rendering of username and password fields.
-   - Tests form validation triggering errors on empty fields.
-   - Tests demo credential auto-fill button interaction.
+3. **`test/unit/auth_bloc_test.dart`**:
+   - Tests session check (`CheckAuthSessionReq`) for restored and null sessions.
+   - Tests login flow with success (`Authenticated`) and failure (`AuthError`).
+   - Tests logout flow (`Unauthenticated`).
+   - Tests session expiry handling (`SessionExpiredReq`).
+
+4. **`test/unit/cart_bloc_test.dart`**:
+   - Tests cart loading, empty cart state, and loaded items state.
+   - Tests adding items, updating quantity, item removal, and undo item restoration.
+   - Tests promo code application and cart clearing.
+
+5. **`test/unit/orders_bloc_test.dart`**:
+   - Tests loading orders from `OrdersRepository`.
+   - Tests order placement with `latestPlacedOrder`.
+   - Tests order cancellation and status updates.
+
+6. **`test/unit/orders_repository_test.dart`**:
+   - Tests local data source delegation for orders retrieval.
+   - Tests model-to-entity mapping and order placement persistence.
+   - Tests cancellation status persistence in Hive.
+
+7. **`test/unit/search_bloc_test.dart`**:
+   - Tests query debouncing and catalog caching.
+   - Tests multi-attribute search across ingredients, tags, and cuisine.
+   - Tests category switching and subcategory tag clearing.
+   - Tests reset filters logic.
+
+8. **Widget Tests**:
+   - `test/widget/login_form_widget_test.dart`: Validates credential inputs and error states.
+   - `test/widget/onboarding_widget_test.dart`: Validates slide content rendering and swipe interaction.
+   - `test/widget/filter_screen_test.dart`: Validates filter screen components, chips, and price slider.
 
 ### Run Tests:
 ```bash
 flutter test
 ```
-*Result: All 15 unit and widget tests pass.*
+*Result: All 46 unit and widget tests pass.*
 
 ---
 
