@@ -4,13 +4,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yum_quick/src/core/constants/app_assets.dart';
 import 'package:yum_quick/src/core/constants/app_colors.dart';
+import 'package:yum_quick/src/core/presentation/components/offline_banner.dart';
+import 'package:yum_quick/src/core/utils/pricing_calculator.dart';
 import 'package:yum_quick/src/features/cart/domain/entities/cart_item_entity.dart';
-import 'package:yum_quick/src/features/cart/state/cart_bloc.dart';
-import 'package:yum_quick/src/features/cart/state/cart_event.dart';
+import 'package:yum_quick/src/features/cart/presentation/bloc/cart_bloc.dart';
+import 'package:yum_quick/src/features/cart/presentation/bloc/cart_event.dart';
 import 'package:yum_quick/src/features/orders/domain/entities/order_entity.dart';
-import 'package:yum_quick/src/features/orders/state/orders_bloc.dart';
-import 'package:yum_quick/src/features/orders/state/orders_event.dart';
-import 'package:yum_quick/src/features/orders/state/orders_state.dart';
+import 'package:yum_quick/src/features/orders/presentation/bloc/orders_bloc.dart';
+import 'package:yum_quick/src/features/orders/presentation/bloc/orders_event.dart';
+import 'package:yum_quick/src/features/orders/presentation/bloc/orders_state.dart';
 
 class OrdersScreen extends StatefulWidget {
   const OrdersScreen({super.key});
@@ -507,27 +509,28 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<OrdersBloc, OrdersState>(
-      builder: (context, state) {
-        final allOrders = state is OrdersLoaded
-            ? state.orders
-            : <OrderEntity>[];
-        final activeOrders = allOrders.where((o) => o.isActive).toList();
-        final completedOrders = allOrders
-            .where((o) => o.status == OrderStatus.delivered)
-            .toList();
-        final cancelledOrders = allOrders
-            .where((o) => o.status == OrderStatus.cancelled)
-            .toList();
+    return Scaffold(
+      backgroundColor: AppColors.primaryYellow,
+      body: BlocBuilder<OrdersBloc, OrdersState>(
+        builder: (context, state) {
+          final allOrders = state is OrdersLoaded
+              ? state.orders
+              : <OrderEntity>[];
+          final activeOrders = allOrders.where((o) => o.isActive).toList();
+          final completedOrders = allOrders
+              .where((o) => o.status == OrderStatus.delivered)
+              .toList();
+          final cancelledOrders = allOrders
+              .where((o) => o.status == OrderStatus.cancelled)
+              .toList();
 
-        return Scaffold(
-          backgroundColor: AppColors.primaryYellow,
-          body: Column(
-            children: [
-              // 1. Curved Yellow Header
-              SafeArea(
-                bottom: false,
-                child: Padding(
+          return SafeArea(
+            bottom: false,
+            child: Column(
+              children: [
+                const OfflineBanner(),
+                // 1. Curved Yellow Header
+                Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 12,
@@ -565,9 +568,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
                     ],
                   ),
                 ),
-              ),
 
-              // 2. White Curved Card Body
+                // 2. White Curved Card Body
               Expanded(
                 child: Container(
                   width: double.infinity,
@@ -611,7 +613,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
           ),
         );
       },
-    );
+    ),
+  );
   }
 
   Widget _buildPillTab({required String title, required int index}) {
@@ -740,7 +743,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '${order.items.length} items',
+                          '${order.items.length} ${order.items.length == 1 ? 'item' : 'items'}',
                           style: TextStyle(
                             fontSize: 12,
                             color: AppColors.textPrimary.withValues(alpha: 0.6),
@@ -750,7 +753,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                     ),
                   ),
                   Text(
-                    '\$${order.total.toStringAsFixed(2)}',
+                    PricingCalculator.formatINR(order.total),
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w900,
@@ -912,7 +915,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '${order.items.length} items',
+                          '${order.items.length} ${order.items.length == 1 ? 'item' : 'items'}',
                           style: TextStyle(
                             fontSize: 12,
                             color: AppColors.textPrimary.withValues(alpha: 0.6),
@@ -922,7 +925,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                     ),
                   ),
                   Text(
-                    '\$${order.total.toStringAsFixed(2)}',
+                    PricingCalculator.formatINR(order.total),
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w900,
@@ -1080,7 +1083,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${order.items.length} items',
+                      '${order.items.length} ${order.items.length == 1 ? 'item' : 'items'}',
                       style: TextStyle(
                         fontSize: 12,
                         color: AppColors.textPrimary.withValues(alpha: 0.6),
@@ -1090,7 +1093,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                 ),
               ),
               Text(
-                '\$${order.total.toStringAsFixed(2)}',
+                PricingCalculator.formatINR(order.total),
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w900,

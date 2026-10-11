@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:yum_quick/src/core/utils/category_mapper.dart';
+import 'package:yum_quick/src/features/recipes/domain/entities/recipe_entity.dart';
 
-import '../../recipes/domain/entities/recipe_entity.dart';
 import 'search_event.dart';
 
 sealed class SearchState extends Equatable {

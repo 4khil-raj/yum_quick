@@ -44,14 +44,22 @@ class CategoryMapper {
     switch (category) {
       case RecipeCategory.snacks:
         return lowerMealTypes.any(
-              (m) => m.contains('snack') || m.contains('appetizer'),
+              (m) =>
+                  m.contains('snack') ||
+                  m.contains('appetizer') ||
+                  m.contains('side dish'),
             ) ||
             lowerTags.any(
               (t) =>
                   t.contains('snack') ||
                   t.contains('appetizer') ||
+                  t.contains('side dish') ||
                   t.contains('finger food') ||
-                  t.contains('dip'),
+                  t.contains('street food') ||
+                  t.contains('dip') ||
+                  t.contains('skewers') ||
+                  t.contains('rolls') ||
+                  t.contains('bruschetta'),
             );
 
       case RecipeCategory.meal:
@@ -70,7 +78,12 @@ class CategoryMapper {
                   t.contains('pizza') ||
                   t.contains('curry') ||
                   t.contains('chicken') ||
-                  t.contains('beef'),
+                  t.contains('beef') ||
+                  t.contains('stir-fry') ||
+                  t.contains('rice') ||
+                  t.contains('soup') ||
+                  t.contains('tagine') ||
+                  t.contains('wrap'),
             );
 
       case RecipeCategory.vegan:
@@ -78,7 +91,10 @@ class CategoryMapper {
           (t) =>
               t.contains('vegan') ||
               t.contains('vegetarian') ||
-              t.contains('plant-based'),
+              t.contains('plant-based') ||
+              t.contains('salad') ||
+              t.contains('falafel') ||
+              t.contains('chickpea'),
         );
 
       case RecipeCategory.dessert:
@@ -92,7 +108,8 @@ class CategoryMapper {
                   t.contains('chocolate') ||
                   t.contains('baking') ||
                   t.contains('pudding') ||
-                  t.contains('ice cream'),
+                  t.contains('ice cream') ||
+                  t.contains('tiramisu'),
             );
 
       case RecipeCategory.drinks:
@@ -108,7 +125,9 @@ class CategoryMapper {
                   t.contains('juice') ||
                   t.contains('shake') ||
                   t.contains('tea') ||
-                  t.contains('coffee'),
+                  t.contains('coffee') ||
+                  t.contains('lassi') ||
+                  t.contains('mojito'),
             );
 
       case RecipeCategory.all:

@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:yum_quick/src/features/auth/domain/repositories/auth_repository.dart';
 import 'package:yum_quick/src/features/auth/presentation/screens/login_screen.dart';
-import 'package:yum_quick/src/features/auth/state/auth_bloc.dart';
+import 'package:yum_quick/src/features/auth/presentation/bloc/auth_bloc.dart';
 
 class MockAuthRepository extends Mock implements AuthRepository {}
 
@@ -14,10 +14,6 @@ void main() {
 
   setUp(() {
     mockAuthRepository = MockAuthRepository();
-    when(() => mockAuthRepository.isBiometricAvailable())
-        .thenAnswer((_) async => false);
-    when(() => mockAuthRepository.isBiometricEnabled())
-        .thenAnswer((_) async => false);
     when(() => mockAuthRepository.getSavedUsername())
         .thenAnswer((_) async => null);
     when(() => mockAuthRepository.restoreSession())

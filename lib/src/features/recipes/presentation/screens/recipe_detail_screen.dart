@@ -5,16 +5,18 @@ import 'package:go_router/go_router.dart';
 import 'package:yum_quick/src/core/constants/app_assets.dart';
 import 'package:yum_quick/src/core/constants/app_colors.dart';
 import 'package:yum_quick/src/core/presentation/components/app_button.dart';
+import 'package:yum_quick/src/core/presentation/components/offline_banner.dart';
 import 'package:yum_quick/src/core/presentation/components/quantity_control.dart';
 import 'package:yum_quick/src/core/presentation/components/rating_badge.dart';
+import 'package:yum_quick/src/core/utils/app_snackbar.dart';
 import 'package:yum_quick/src/core/utils/pricing_calculator.dart';
 import 'package:yum_quick/src/features/cart/domain/entities/cart_item_entity.dart';
-import 'package:yum_quick/src/features/cart/state/cart_bloc.dart';
-import 'package:yum_quick/src/features/cart/state/cart_event.dart';
+import 'package:yum_quick/src/features/cart/presentation/bloc/cart_bloc.dart';
+import 'package:yum_quick/src/features/cart/presentation/bloc/cart_event.dart';
 import 'package:yum_quick/src/features/recipes/domain/entities/recipe_entity.dart';
-import 'package:yum_quick/src/features/recipes/state/recipe_bloc.dart';
-import 'package:yum_quick/src/features/recipes/state/recipe_event.dart';
-import 'package:yum_quick/src/features/recipes/state/recipe_state.dart';
+import 'package:yum_quick/src/features/recipes/presentation/bloc/recipe_bloc.dart';
+import 'package:yum_quick/src/features/recipes/presentation/bloc/recipe_event.dart';
+import 'package:yum_quick/src/features/recipes/presentation/bloc/recipe_state.dart';
 
 class RecipeDetailScreen extends StatefulWidget {
   final RecipeEntity recipe;
@@ -60,31 +62,20 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
     );
 
     context.read<CartBloc>().add(AddToCartReq(cartItem));
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Added $_quantity × ${widget.recipe.name} to cart!'),
-        backgroundColor: AppColors.success,
-        action: SnackBarAction(
-          label: 'View Cart',
-          textColor: Colors.white,
-          onPressed: () => context.push('/cart'),
-        ),
-      ),
-    );
+    AppSnackBar.showSuccess(context, message: 'Added to cart!');
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RecipeBloc, RecipeState>(
-      builder: (context, state) {
-        final isFavorite =
-            state is RecipeSuccess &&
-            state.favoriteIds.contains(widget.recipe.id);
+    return Scaffold(
+      backgroundColor: AppColors.backgroundLight,
+      body: BlocBuilder<RecipeBloc, RecipeState>(
+        builder: (context, state) {
+          final isFavorite =
+              state is RecipeSuccess &&
+              state.favoriteIds.contains(widget.recipe.id);
 
-        return Scaffold(
-          backgroundColor: AppColors.backgroundLight,
-          body: Stack(
+          return Stack(
             children: [
               // Scrollable Details
               SingleChildScrollView(
@@ -455,10 +446,18 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                   ),
                 ),
               ),
+
+              // Offline Banner at top
+              const Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: OfflineBanner(),
+              ),
             ],
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 

@@ -4,8 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:yum_quick/src/core/constants/app_assets.dart';
 import 'package:yum_quick/src/core/constants/app_colors.dart';
 import 'package:yum_quick/src/core/presentation/components/app_button.dart';
-import 'package:yum_quick/src/features/orders/state/orders_bloc.dart';
-import 'package:yum_quick/src/features/orders/state/orders_state.dart';
+import 'package:yum_quick/src/core/presentation/components/offline_banner.dart';
+import 'package:yum_quick/src/features/orders/presentation/bloc/orders_bloc.dart';
+import 'package:yum_quick/src/features/orders/presentation/bloc/orders_state.dart';
 
 class OrderConfirmedScreen extends StatelessWidget {
   const OrderConfirmedScreen({super.key});
@@ -21,9 +22,13 @@ class OrderConfirmedScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-          child: Column(
+        child: Column(
+          children: [
+            const OfflineBanner(),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Spacer(),
@@ -100,6 +105,9 @@ class OrderConfirmedScreen extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ],
+  ),
+),
+);
   }
 }

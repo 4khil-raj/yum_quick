@@ -3,17 +3,22 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yum_quick/src/core/constants/app_assets.dart';
 import 'package:yum_quick/src/core/constants/app_colors.dart';
-import 'package:yum_quick/src/core/utils/pricing_calculator.dart';
 
-import '../features/cart/state/cart_bloc.dart';
-import '../features/cart/state/cart_state.dart';
+import '../core/utils/category_mapper.dart';
+import '../features/recipes/presentation/bloc/recipe_bloc.dart';
+import '../features/recipes/presentation/bloc/recipe_event.dart';
 
 class MainNavigationShell extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
 
   const MainNavigationShell({super.key, required this.navigationShell});
 
-  void _onItemTapped(int index) {
+  void _onItemTapped(BuildContext context, int index) {
+    if (index == 0) {
+      context.read<RecipeBloc>().add(
+        const ChangeCategoryReq(RecipeCategory.all),
+      );
+    }
     navigationShell.goBranch(
       index,
       initialLocation: index == navigationShell.currentIndex,
@@ -26,45 +31,6 @@ class MainNavigationShell extends StatelessWidget {
 
     return Scaffold(
       body: navigationShell,
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: BlocBuilder<CartBloc, CartState>(
-        builder: (context, state) {
-          if (state is CartLoaded && state.totalItemCount > 0) {
-            return Container(
-              margin: const EdgeInsets.only(bottom: 74),
-              child: FloatingActionButton.extended(
-                onPressed: () => context.push('/cart'),
-                backgroundColor: AppColors.primaryYellow,
-                foregroundColor: AppColors.textPrimary,
-                elevation: 6,
-                icon: Badge(
-                  label: Text(
-                    '${state.totalItemCount}',
-                    style: const TextStyle(fontWeight: FontWeight.w700),
-                  ),
-                  backgroundColor: AppColors.primaryOrange,
-                  textColor: Colors.white,
-                  child: Image.asset(
-                    AppAssets.icCart,
-                    width: 22,
-                    height: 22,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                label: Text(
-                  'Cart • ${PricingCalculator.formatINR(state.total)}',
-                  style: const TextStyle(
-                    color: AppColors.textPrimary,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-            );
-          }
-          return const SizedBox.shrink();
-        },
-      ),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           color: AppColors.primaryOrange,
@@ -85,26 +51,31 @@ class MainNavigationShell extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildNavItem(
+                  context: context,
                   index: 0,
                   currentIndex: currentIndex,
                   assetPath: AppAssets.navHome,
                 ),
                 _buildNavItem(
+                  context: context,
                   index: 1,
                   currentIndex: currentIndex,
                   assetPath: AppAssets.navMenu,
                 ),
                 _buildNavItem(
+                  context: context,
                   index: 2,
                   currentIndex: currentIndex,
                   assetPath: AppAssets.navFavorite,
                 ),
                 _buildNavItem(
+                  context: context,
                   index: 3,
                   currentIndex: currentIndex,
                   assetPath: AppAssets.navOrders,
                 ),
                 _buildNavItem(
+                  context: context,
                   index: 4,
                   currentIndex: currentIndex,
                   assetPath: AppAssets.navSupport,
@@ -118,6 +89,7 @@ class MainNavigationShell extends StatelessWidget {
   }
 
   Widget _buildNavItem({
+    required BuildContext context,
     required int index,
     required int currentIndex,
     String? assetPath,
@@ -127,7 +99,7 @@ class MainNavigationShell extends StatelessWidget {
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: () => _onItemTapped(index),
+      onTap: () => _onItemTapped(context, index),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         child: Column(

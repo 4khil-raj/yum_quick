@@ -6,11 +6,11 @@ import 'package:yum_quick/src/core/constants/app_colors.dart';
 import 'package:yum_quick/src/core/presentation/components/app_button.dart';
 import 'package:yum_quick/src/core/presentation/components/curved_header.dart';
 import 'package:yum_quick/src/core/utils/pricing_calculator.dart';
-import 'package:yum_quick/src/features/orders/state/orders_bloc.dart';
-import 'package:yum_quick/src/features/orders/state/orders_event.dart';
-import 'package:yum_quick/src/features/cart/state/cart_bloc.dart';
-import 'package:yum_quick/src/features/cart/state/cart_event.dart';
-import 'package:yum_quick/src/features/cart/state/cart_state.dart';
+import 'package:yum_quick/src/features/orders/presentation/bloc/orders_bloc.dart';
+import 'package:yum_quick/src/features/orders/presentation/bloc/orders_event.dart';
+import 'package:yum_quick/src/features/cart/presentation/bloc/cart_bloc.dart';
+import 'package:yum_quick/src/features/cart/presentation/bloc/cart_event.dart';
+import 'package:yum_quick/src/features/cart/presentation/bloc/cart_state.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -62,9 +62,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           }
           final cartState = state;
 
-          return Column(
-            children: [
-              CurvedHeader(
+          return SafeArea(
+            top: false,
+            child: Column(
+              children: [
+                CurvedHeader(
                 leading: IconButton(
                   icon: Image.asset(
                     AppAssets.icArrowBack,
@@ -209,7 +211,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
                       // Items Preview
                       _buildSectionTitle(
-                        'Order Summary (${cartState.totalItemCount} items)',
+                        'Order Summary (${cartState.totalItemCount} ${cartState.totalItemCount == 1 ? 'item' : 'items'})',
                       ),
                       const SizedBox(height: 10),
                       Container(
@@ -264,8 +266,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 ),
               ),
             ],
-          );
-        },
+          ),
+        );
+      },
       ),
     );
   }

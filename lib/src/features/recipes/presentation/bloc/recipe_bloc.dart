@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yum_quick/src/core/errors/failures.dart';
 import 'package:yum_quick/src/core/utils/category_mapper.dart';
 
-import '../domain/repositories/recipe_repository.dart';
+import '../../domain/repositories/recipe_repository.dart';
 import 'recipe_event.dart';
 import 'recipe_state.dart';
 

@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-import '../../cart/domain/entities/cart_item_entity.dart';
-import '../domain/entities/order_entity.dart';
+import '../../../cart/domain/entities/cart_item_entity.dart';
+import '../../domain/entities/order_entity.dart';
 
 sealed class OrdersEvent extends Equatable {
   const OrdersEvent();

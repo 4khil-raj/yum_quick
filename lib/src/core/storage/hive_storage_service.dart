@@ -7,15 +7,31 @@ class HiveStorageService {
   static const String boxCart = 'cart_box';
   static const String boxFavorites = 'favorites_box';
   static const String boxRecentSearches = 'recent_searches_box';
+  static const String boxOrders = 'orders_box';
+  static const String boxPreferences = 'preferences_box';
 
   static const String keyFirstPageRecipes = 'first_page_recipes';
 
   Future<void> init() async {
     await Hive.initFlutter();
-    await Hive.openBox<String>(boxRecipesCache);
-    await Hive.openBox<String>(boxCart);
-    await Hive.openBox<bool>(boxFavorites);
-    await Hive.openBox<String>(boxRecentSearches);
+    if (!Hive.isBoxOpen(boxRecipesCache)) {
+      await Hive.openBox<String>(boxRecipesCache);
+    }
+    if (!Hive.isBoxOpen(boxCart)) {
+      await Hive.openBox<String>(boxCart);
+    }
+    if (!Hive.isBoxOpen(boxFavorites)) {
+      await Hive.openBox<bool>(boxFavorites);
+    }
+    if (!Hive.isBoxOpen(boxRecentSearches)) {
+      await Hive.openBox<String>(boxRecentSearches);
+    }
+    if (!Hive.isBoxOpen(boxOrders)) {
+      await Hive.openBox<String>(boxOrders);
+    }
+    if (!Hive.isBoxOpen(boxPreferences)) {
+      await Hive.openBox<String>(boxPreferences);
+    }
   }
 
   // --- Recipe Cache ---
@@ -114,6 +130,50 @@ class HiveStorageService {
 
   Future<void> clearRecentSearches() async {
     final box = Hive.box<String>(boxRecentSearches);
+    await box.clear();
+  }
+
+  // --- Orders Persistence ---
+  Future<void> saveOrders(List<Map<String, dynamic>> orders) async {
+    final box = Hive.box<String>(boxOrders);
+    await box.put('orders_list', jsonEncode(orders));
+  }
+
+  List<Map<String, dynamic>> getOrders() {
+    final box = Hive.box<String>(boxOrders);
+    final raw = box.get('orders_list');
+    if (raw == null) return [];
+    try {
+      final decoded = jsonDecode(raw) as List;
+      return decoded.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<void> clearOrders() async {
+    final box = Hive.box<String>(boxOrders);
+    await box.clear();
+  }
+
+  // --- Non-Sensitive Preferences Persistence (Onboarding, Username) ---
+  Future<void> savePreference(String key, String value) async {
+    final box = Hive.box<String>(boxPreferences);
+    await box.put(key, value);
+  }
+
+  String? getPreference(String key) {
+    final box = Hive.box<String>(boxPreferences);
+    return box.get(key);
+  }
+
+  Future<void> removePreference(String key) async {
+    final box = Hive.box<String>(boxPreferences);
+    await box.delete(key);
+  }
+
+  Future<void> clearPreferences() async {
+    final box = Hive.box<String>(boxPreferences);
     await box.clear();
   }
 }

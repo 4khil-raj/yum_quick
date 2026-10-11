@@ -9,17 +9,18 @@ import 'package:yum_quick/src/core/presentation/components/curved_header.dart';
 import 'package:yum_quick/src/core/presentation/components/empty_state_widget.dart';
 import 'package:yum_quick/src/core/presentation/components/food_card.dart';
 import 'package:yum_quick/src/core/presentation/components/shimmer_loading.dart';
+import 'package:yum_quick/src/core/utils/app_snackbar.dart';
 import 'package:yum_quick/src/core/utils/category_mapper.dart';
 import 'package:yum_quick/src/features/cart/domain/entities/cart_item_entity.dart';
-import 'package:yum_quick/src/features/cart/state/cart_bloc.dart';
-import 'package:yum_quick/src/features/cart/state/cart_event.dart';
-import 'package:yum_quick/src/features/search/state/search_bloc.dart';
-import 'package:yum_quick/src/features/search/state/search_event.dart';
-import 'package:yum_quick/src/features/search/state/search_state.dart';
+import 'package:yum_quick/src/features/cart/presentation/bloc/cart_bloc.dart';
+import 'package:yum_quick/src/features/cart/presentation/bloc/cart_event.dart';
+import 'package:yum_quick/src/features/search/presentation/bloc/search_bloc.dart';
+import 'package:yum_quick/src/features/search/presentation/bloc/search_event.dart';
+import 'package:yum_quick/src/features/search/presentation/bloc/search_state.dart';
 import 'package:yum_quick/src/features/recipes/domain/entities/recipe_entity.dart';
-import 'package:yum_quick/src/features/recipes/state/recipe_bloc.dart';
-import 'package:yum_quick/src/features/recipes/state/recipe_event.dart';
-import 'package:yum_quick/src/features/recipes/state/recipe_state.dart';
+import 'package:yum_quick/src/features/recipes/presentation/bloc/recipe_bloc.dart';
+import 'package:yum_quick/src/features/recipes/presentation/bloc/recipe_event.dart';
+import 'package:yum_quick/src/features/recipes/presentation/bloc/recipe_state.dart';
 
 class MenuScreen extends StatefulWidget {
   final RecipeCategory? initialCategory;
@@ -64,8 +65,10 @@ class _MenuScreenState extends State<MenuScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      body: Column(
-        children: [
+      body: SafeArea(
+        top: false,
+        child: Column(
+          children: [
           // Header with search bar and filter button
           CurvedHeader(
             title: const Text(
@@ -251,8 +254,9 @@ class _MenuScreenState extends State<MenuScreen> {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildCategoryFilterBar(BuildContext context) {
     return BlocBuilder<SearchBloc, SearchState>(
@@ -296,6 +300,7 @@ class _MenuScreenState extends State<MenuScreen> {
                     context.read<SearchBloc>().add(
                       UpdateFilterReq(
                         category: selected ? cat : RecipeCategory.all,
+                        selectedTags: const {},
                       ),
                     );
                   },
@@ -320,12 +325,6 @@ class _MenuScreenState extends State<MenuScreen> {
         ),
       ),
     );
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Added ${recipe.name} to cart!'),
-        backgroundColor: AppColors.primaryOrange,
-        duration: const Duration(seconds: 1),
-      ),
-    );
+    AppSnackBar.showSuccess(context, message: 'Added to cart!');
   }
 }

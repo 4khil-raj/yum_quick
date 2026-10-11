@@ -56,7 +56,22 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       final cachedUser = await localDataSource.getUser();
-      return cachedUser?.toEntity();
+      if (cachedUser != null) {
+        return cachedUser.toEntity();
+      }
+
+      final savedUser = await localDataSource.getSavedUsername();
+      if (savedUser != null && savedUser.isNotEmpty) {
+        return UserEntity(
+          id: 1,
+          username: savedUser,
+          email: '$savedUser@email.com',
+          firstName: savedUser,
+          lastName: '',
+          accessToken: token,
+        );
+      }
+      return null;
     } catch (_) {
       return null;
     }
@@ -65,26 +80,6 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<void> logout() async {
     await localDataSource.clearAuth();
-  }
-
-  @override
-  Future<bool> isBiometricAvailable() async {
-    return localDataSource.isBiometricAvailable();
-  }
-
-  @override
-  Future<bool> authenticateWithBiometrics() async {
-    return localDataSource.authenticateWithBiometrics();
-  }
-
-  @override
-  Future<void> setBiometricEnabled(bool enabled) async {
-    await localDataSource.setBiometricEnabled(enabled);
-  }
-
-  @override
-  Future<bool> isBiometricEnabled() async {
-    return localDataSource.isBiometricEnabled();
   }
 
   @override

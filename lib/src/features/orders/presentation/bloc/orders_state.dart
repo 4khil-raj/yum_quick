@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../domain/entities/order_entity.dart';
+import '../../domain/entities/order_entity.dart';
 
 sealed class OrdersState extends Equatable {
   const OrdersState();
@@ -40,4 +40,13 @@ class OrdersLoaded extends OrdersState {
 
   @override
   List<Object?> get props => [orders, latestPlacedOrder];
+}
+
+class OrdersError extends OrdersState {
+  final String message;
+
+  const OrdersError(this.message);
+
+  @override
+  List<Object?> get props => [message];
 }

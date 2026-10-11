@@ -10,14 +10,6 @@ abstract class AuthRepository {
 
   Future<void> logout();
 
-  Future<bool> isBiometricAvailable();
-
-  Future<bool> authenticateWithBiometrics();
-
-  Future<void> setBiometricEnabled(bool enabled);
-
-  Future<bool> isBiometricEnabled();
-
   Future<String?> getSavedUsername();
 
   Future<void> saveUsername(String username);

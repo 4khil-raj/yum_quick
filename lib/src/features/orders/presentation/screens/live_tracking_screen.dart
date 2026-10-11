@@ -14,8 +14,10 @@ class LiveTrackingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      body: Column(
-        children: [
+      body: SafeArea(
+        top: false,
+        child: Column(
+          children: [
           CurvedHeader(
             leading: IconButton(
               icon: Image.asset(AppAssets.icArrowBack, width: 20, height: 20),
@@ -201,11 +203,6 @@ class LiveTrackingScreen extends StatelessWidget {
                             );
                           },
                         ),
-                        const SizedBox(width: 8),
-                        _buildContactIcon(
-                          icon: Icons.chat_bubble_rounded,
-                          onTap: () => context.push('/support'),
-                        ),
                       ],
                     ),
                   ),
@@ -252,8 +249,9 @@ class LiveTrackingScreen extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildContactIcon({
     required IconData icon,

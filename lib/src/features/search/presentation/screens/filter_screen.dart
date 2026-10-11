@@ -3,11 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yum_quick/src/core/constants/app_assets.dart';
 import 'package:yum_quick/src/core/constants/app_colors.dart';
+import 'package:yum_quick/src/core/presentation/components/offline_banner.dart';
 import 'package:yum_quick/src/core/utils/category_mapper.dart';
-import 'package:yum_quick/src/features/cart/state/cart_bloc.dart';
-import 'package:yum_quick/src/features/cart/state/cart_state.dart';
-import 'package:yum_quick/src/features/search/state/search_bloc.dart';
-import 'package:yum_quick/src/features/search/state/search_event.dart';
+import 'package:yum_quick/src/features/cart/presentation/bloc/cart_bloc.dart';
+import 'package:yum_quick/src/features/cart/presentation/bloc/cart_state.dart';
+import 'package:yum_quick/src/features/search/presentation/bloc/search_bloc.dart';
+import 'package:yum_quick/src/features/search/presentation/bloc/search_event.dart';
 
 class FilterScreen extends StatefulWidget {
   final RecipeCategory? initialCategory;
@@ -22,7 +23,7 @@ class _FilterScreenState extends State<FilterScreen> {
   late RecipeCategory _selectedCategory;
   int _selectedRating = 4;
   late Set<String> _selectedTags;
-  double _priceValue = 10.0;
+  double _priceValue = 500.0;
 
   static const List<RecipeCategory> _displayCategories = [
     RecipeCategory.snacks,
@@ -90,14 +91,6 @@ class _FilterScreenState extends State<FilterScreen> {
     ],
   };
 
-  static const Map<RecipeCategory, Set<String>> _defaultFigmaTags = {
-    RecipeCategory.snacks: {'Skewers', 'Salmon'},
-    RecipeCategory.meal: {'Sushi', 'Curry'},
-    RecipeCategory.vegan: {'Mushroom', 'Risotto'},
-    RecipeCategory.dessert: {'Cupcakes', 'Chocolate'},
-    RecipeCategory.drinks: {'Fresh Juice', 'Coffee'},
-  };
-
   @override
   void initState() {
     super.initState();
@@ -114,27 +107,20 @@ class _FilterScreenState extends State<FilterScreen> {
 
     if (searchState.minRating > 0) {
       _selectedRating = searchState.minRating.round();
-    } else if (_selectedCategory == RecipeCategory.vegan) {
-      _selectedRating = 3;
     } else {
-      _selectedRating = 4;
+      _selectedRating = 0;
     }
 
     if (searchState.selectedTags.isNotEmpty) {
       _selectedTags = Set<String>.from(searchState.selectedTags);
     } else {
-      _selectedTags = Set<String>.from(
-        _defaultFigmaTags[_selectedCategory] ?? {},
-      );
+      _selectedTags = <String>{};
     }
 
-    if (searchState.maxPrice < 500) {
-      _priceValue = searchState.maxPrice.clamp(1.0, 100.0);
-    } else if (_selectedCategory == RecipeCategory.meal ||
-        _selectedCategory == RecipeCategory.dessert) {
-      _priceValue = 50.0;
+    if (searchState.maxPrice <= 500 && searchState.maxPrice >= 99) {
+      _priceValue = searchState.maxPrice.clamp(99.0, 500.0);
     } else {
-      _priceValue = 10.0;
+      _priceValue = 500.0;
     }
   }
 
@@ -142,20 +128,7 @@ class _FilterScreenState extends State<FilterScreen> {
     if (_selectedCategory == category) return;
     setState(() {
       _selectedCategory = category;
-      _selectedTags = Set<String>.from(_defaultFigmaTags[category] ?? {});
-      if (category == RecipeCategory.vegan) {
-        _selectedRating = 3;
-        _priceValue = 10.0;
-      } else if (category == RecipeCategory.meal) {
-        _selectedRating = 4;
-        _priceValue = 50.0;
-      } else if (category == RecipeCategory.dessert) {
-        _selectedRating = 4;
-        _priceValue = 50.0;
-      } else if (category == RecipeCategory.snacks) {
-        _selectedRating = 4;
-        _priceValue = 10.0;
-      }
+      _selectedTags = <String>{};
     });
   }
 
@@ -167,6 +140,15 @@ class _FilterScreenState extends State<FilterScreen> {
         _selectedTags.add(tag);
       }
     });
+  }
+
+  void _onReset() {
+    setState(() {
+      _selectedRating = 0;
+      _selectedTags.clear();
+      _priceValue = 500.0;
+    });
+    context.read<SearchBloc>().add(const ClearFiltersReq());
   }
 
   void _onApply() {
@@ -193,23 +175,25 @@ class _FilterScreenState extends State<FilterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final topPadding = MediaQuery.of(context).padding.top;
     final currentPillList =
         _categoryTags[_selectedCategory] ??
         _categoryTags[RecipeCategory.snacks]!;
 
     return Scaffold(
       backgroundColor: AppColors.primaryYellow,
-      body: Column(
-        children: [
-          // Yellow Header Bar matching Figma
-          Container(
-            padding: EdgeInsets.only(
-              top: topPadding + 8,
-              bottom: 16,
-              left: 16,
-              right: 16,
-            ),
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            const OfflineBanner(),
+            // Yellow Header Bar matching Figma
+            Container(
+              padding: const EdgeInsets.only(
+                top: 8,
+                bottom: 16,
+                left: 16,
+                right: 16,
+              ),
             child: Row(
               children: [
                 // Back Chevron Button in Orange
@@ -539,14 +523,29 @@ class _FilterScreenState extends State<FilterScreen> {
 
                       const SizedBox(height: 24),
 
-                      // Section 4: Price Title in Orange
-                      const Text(
-                        'Price',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.primaryOrange,
-                        ),
+                      // Section 4: Price Title in Orange with Current Value
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Price',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.primaryOrange,
+                            ),
+                          ),
+                          Text(
+                            _priceValue >= 499.0
+                                ? '₹499+'
+                                : 'Up to ₹${_priceValue.round()}',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.primaryOrange,
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 6),
 
@@ -569,22 +568,22 @@ class _FilterScreenState extends State<FilterScreen> {
                         ),
                         child: Slider(
                           value: _priceValue,
-                          min: 1.0,
-                          max: 100.0,
+                          min: 99.0,
+                          max: 500.0,
                           onChanged: (val) {
                             setState(() => _priceValue = val);
                           },
                         ),
                       ),
 
-                      // Price Scale Labels
+                      // Price Scale Labels in Indian Rupees
                       const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 10),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              '\$1',
+                              '₹99',
                               style: TextStyle(
                                 fontSize: 11.5,
                                 fontWeight: FontWeight.w600,
@@ -592,7 +591,7 @@ class _FilterScreenState extends State<FilterScreen> {
                               ),
                             ),
                             Text(
-                              '\$10',
+                              '₹199',
                               style: TextStyle(
                                 fontSize: 11.5,
                                 fontWeight: FontWeight.w600,
@@ -600,7 +599,7 @@ class _FilterScreenState extends State<FilterScreen> {
                               ),
                             ),
                             Text(
-                              '\$50',
+                              '₹299',
                               style: TextStyle(
                                 fontSize: 11.5,
                                 fontWeight: FontWeight.w600,
@@ -608,7 +607,7 @@ class _FilterScreenState extends State<FilterScreen> {
                               ),
                             ),
                             Text(
-                              '\$100 >',
+                              '₹499 >',
                               style: TextStyle(
                                 fontSize: 11.5,
                                 fontWeight: FontWeight.w600,
@@ -648,6 +647,22 @@ class _FilterScreenState extends State<FilterScreen> {
                         ),
                       ),
 
+                      const SizedBox(height: 10),
+
+                      Center(
+                        child: TextButton(
+                          onPressed: _onReset,
+                          child: const Text(
+                            'Reset All Filters',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primaryOrange,
+                            ),
+                          ),
+                        ),
+                      ),
+
                       const SizedBox(height: 16),
                     ],
                   ),
@@ -657,6 +672,7 @@ class _FilterScreenState extends State<FilterScreen> {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 }

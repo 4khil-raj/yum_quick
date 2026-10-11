@@ -4,34 +4,70 @@ import 'package:go_router/go_router.dart';
 import 'package:yum_quick/src/core/constants/app_assets.dart';
 import 'package:yum_quick/src/core/constants/app_colors.dart';
 import 'package:yum_quick/src/core/presentation/components/food_card.dart';
+import 'package:yum_quick/src/core/presentation/components/offline_banner.dart';
+import 'package:yum_quick/src/core/utils/app_snackbar.dart';
 import 'package:yum_quick/src/features/cart/domain/entities/cart_item_entity.dart';
-import 'package:yum_quick/src/features/cart/state/cart_bloc.dart';
-import 'package:yum_quick/src/features/cart/state/cart_event.dart';
-import 'package:yum_quick/src/features/cart/state/cart_state.dart';
+import 'package:yum_quick/src/features/cart/presentation/bloc/cart_bloc.dart';
+import 'package:yum_quick/src/features/cart/presentation/bloc/cart_event.dart';
+import 'package:yum_quick/src/features/cart/presentation/bloc/cart_state.dart';
 import 'package:yum_quick/src/features/recipes/domain/entities/recipe_entity.dart';
-import 'package:yum_quick/src/features/recipes/state/recipe_bloc.dart';
-import 'package:yum_quick/src/features/recipes/state/recipe_event.dart';
-import 'package:yum_quick/src/features/recipes/state/recipe_state.dart';
+import 'package:yum_quick/src/features/recipes/presentation/bloc/recipe_bloc.dart';
+import 'package:yum_quick/src/features/recipes/presentation/bloc/recipe_event.dart';
+import 'package:yum_quick/src/features/recipes/presentation/bloc/recipe_state.dart';
 
-class BestSellerScreen extends StatelessWidget {
+class BestSellerScreen extends StatefulWidget {
   const BestSellerScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final topPadding = MediaQuery.of(context).padding.top;
+  State<BestSellerScreen> createState() => _BestSellerScreenState();
+}
 
+class _BestSellerScreenState extends State<BestSellerScreen> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (_scrollController.hasClients &&
+        _scrollController.position.pixels >=
+            _scrollController.position.maxScrollExtent - 250) {
+      final recipeState = context.read<RecipeBloc>().state;
+      if (recipeState is RecipeSuccess &&
+          recipeState.hasMore &&
+          !recipeState.isLoadingMore) {
+        context.read<RecipeBloc>().add(const LoadMoreRecipesReq());
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.primaryYellow,
-      body: Column(
-        children: [
-          // Yellow Header matching Figma
-          Container(
-            padding: EdgeInsets.only(
-              top: topPadding + 8,
-              bottom: 16,
-              left: 16,
-              right: 16,
-            ),
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            const OfflineBanner(),
+            // Yellow Header matching Figma
+            Container(
+              padding: const EdgeInsets.only(
+                top: 8,
+                bottom: 16,
+                left: 16,
+                right: 16,
+              ),
             child: Row(
               children: [
                 GestureDetector(
@@ -159,54 +195,96 @@ class BestSellerScreen extends StatelessWidget {
                         state.recipes,
                       )..sort((a, b) => b.reviewCount.compareTo(a.reviewCount));
 
-                      return GridView.builder(
-                        padding: const EdgeInsets.all(16),
-                        itemCount: bestSellers.length,
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              childAspectRatio: 0.72,
-                              crossAxisSpacing: 12,
-                              mainAxisSpacing: 14,
-                            ),
-                        itemBuilder: (context, index) {
-                          final recipe = bestSellers[index];
-                          final isFav = state.favoriteIds.contains(recipe.id);
+                      return CustomScrollView(
+                        controller: _scrollController,
+                        physics: const BouncingScrollPhysics(
+                          parent: AlwaysScrollableScrollPhysics(),
+                        ),
+                        slivers: [
+                          SliverPadding(
+                            padding: const EdgeInsets.all(16),
+                            sliver: SliverGrid(
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                childAspectRatio: 0.72,
+                                crossAxisSpacing: 12,
+                                mainAxisSpacing: 14,
+                              ),
+                              delegate: SliverChildBuilderDelegate(
+                                (context, index) {
+                                  final recipe = bestSellers[index];
+                                  final isFav =
+                                      state.favoriteIds.contains(recipe.id);
 
-                          return FoodCard(
-                            recipe: recipe,
-                            isFavorite: isFav,
-                            onTap: () =>
-                                context.push('/recipe-detail', extra: recipe),
-                            onFavoriteTap: () {
-                              context.read<RecipeBloc>().add(
-                                ToggleFavoriteReq(recipe.id),
-                              );
-                            },
-                            onAddToCart: () {
-                              context.read<CartBloc>().add(
-                                AddToCartReq(
-                                  CartItemEntity(
-                                    recipeId: recipe.id,
-                                    recipeName: recipe.name,
-                                    recipeImage: recipe.image,
-                                    unitPrice: recipe.price,
-                                    quantity: 1,
+                                  return FoodCard(
+                                    recipe: recipe,
+                                    isFavorite: isFav,
+                                    onTap: () => context.push(
+                                      '/recipe-detail',
+                                      extra: recipe,
+                                    ),
+                                    onFavoriteTap: () {
+                                      context.read<RecipeBloc>().add(
+                                        ToggleFavoriteReq(recipe.id),
+                                      );
+                                    },
+                                    onAddToCart: () {
+                                      context.read<CartBloc>().add(
+                                        AddToCartReq(
+                                          CartItemEntity(
+                                            recipeId: recipe.id,
+                                            recipeName: recipe.name,
+                                            recipeImage: recipe.image,
+                                            unitPrice: recipe.price,
+                                            quantity: 1,
+                                          ),
+                                        ),
+                                      );
+                                      AppSnackBar.showSuccess(
+                                        context,
+                                        message: 'Added to cart!',
+                                      );
+                                    },
+                                  );
+                                },
+                                childCount: bestSellers.length,
+                              ),
+                            ),
+                          ),
+                          if (state.isLoadingMore)
+                            const SliverToBoxAdapter(
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(vertical: 20),
+                                child: Center(
+                                  child: SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.5,
+                                      color: AppColors.primaryOrange,
+                                    ),
                                   ),
                                 ),
-                              );
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'Added ${recipe.name} to cart!',
+                              ),
+                            ),
+                          if (!state.hasMore && bestSellers.isNotEmpty)
+                            const SliverToBoxAdapter(
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(vertical: 20),
+                                child: Center(
+                                  child: Text(
+                                    "You've viewed all best sellers",
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: AppColors.textMuted,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
-                                  backgroundColor: AppColors.primaryOrange,
-                                  duration: const Duration(seconds: 1),
                                 ),
-                              );
-                            },
-                          );
-                        },
+                              ),
+                            ),
+                        ],
                       );
                     }
                     return const Center(
@@ -221,6 +299,7 @@ class BestSellerScreen extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 }

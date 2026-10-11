@@ -4,10 +4,11 @@ import 'package:go_router/go_router.dart';
 import 'package:yum_quick/src/core/constants/app_assets.dart';
 import 'package:yum_quick/src/core/constants/app_colors.dart';
 import 'package:yum_quick/src/core/presentation/components/app_text_field.dart';
+import 'package:yum_quick/src/core/presentation/components/offline_banner.dart';
 
-import '../../state/auth_bloc.dart';
-import '../../state/auth_event.dart';
-import '../../state/auth_state.dart';
+import '../bloc/auth_bloc.dart';
+import '../bloc/auth_event.dart';
+import '../bloc/auth_state.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -21,12 +22,15 @@ class _LoginScreenState extends State<LoginScreen> {
   final _usernameController = TextEditingController(text: 'emilys');
   final _passwordController = TextEditingController(text: 'emilyspass');
   bool _obscurePassword = true;
+  bool _autoValidate = false;
 
   @override
   void initState() {
     super.initState();
     final authState = context.read<AuthBloc>().state;
-    if (authState is Unauthenticated && authState.savedUsername != null) {
+    if (authState is Unauthenticated &&
+        authState.savedUsername != null &&
+        authState.savedUsername!.isNotEmpty) {
       _usernameController.text = authState.savedUsername!;
     }
   }
@@ -39,6 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _submit() {
+    setState(() => _autoValidate = true);
     if (_formKey.currentState?.validate() ?? false) {
       context.read<AuthBloc>().add(
         LoginReq(
@@ -49,53 +54,47 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  void _onBiometricPressed() {
-    context.read<AuthBloc>().add(const BiometricLoginReq());
-  }
-
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<AuthBloc, AuthState>(
-      listener: (context, state) {
-        if (state is Authenticated) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Welcome back, ${state.user.fullName}!'),
-              backgroundColor: AppColors.success,
-            ),
-          );
-          context.go('/home');
-        } else if (state is AuthError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: AppColors.error,
-            ),
-          );
-        } else if (state is Unauthenticated &&
-            state.sessionExpiredMessage != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.sessionExpiredMessage!),
-              backgroundColor: AppColors.warning,
-            ),
-          );
-        }
-      },
-      builder: (context, state) {
-        final isLoading = state is AuthLoading;
-        final isBiometricAvailable =
-            (state is Unauthenticated && state.isBiometricSupported) ||
-            (state is AuthError && state.isBiometricSupported);
+    return Scaffold(
+      backgroundColor: AppColors.primaryYellow,
+      body: BlocConsumer<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state is Authenticated) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Welcome back, ${state.user.fullName}!'),
+                backgroundColor: AppColors.success,
+              ),
+            );
+            context.go('/home');
+          } else if (state is AuthError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          } else if (state is Unauthenticated &&
+              state.sessionExpiredMessage != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.sessionExpiredMessage!),
+                backgroundColor: AppColors.warning,
+              ),
+            );
+          }
+        },
+        builder: (context, state) {
+          final isLoading = state is AuthLoading;
 
-        return Scaffold(
-          backgroundColor: AppColors.primaryYellow,
-          body: Column(
-            children: [
-              // 1. Curved Yellow Header with Back Button & Bold White Title
-              SafeArea(
-                bottom: false,
-                child: Padding(
+          return SafeArea(
+            bottom: true,
+            child: Column(
+              children: [
+                const OfflineBanner(),
+                // 1. Curved Yellow Header with Back Button & Bold White Title
+                Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 12,
@@ -133,9 +132,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                 ),
-              ),
 
-              // 2. White Curved Card Body
+                // 2. White Curved Card Body
               Expanded(
                 child: Container(
                   width: double.infinity,
@@ -153,6 +151,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     child: Form(
                       key: _formKey,
+                      autovalidateMode: _autoValidate
+                          ? AutovalidateMode.onUserInteraction
+                          : AutovalidateMode.disabled,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -194,6 +195,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               if (val == null || val.trim().isEmpty) {
                                 return 'Please enter your username';
                               }
+                              if (val.trim().length < 3) {
+                                return 'Username must be at least 3 characters';
+                              }
                               return null;
                             },
                           ),
@@ -232,6 +236,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               if (val == null || val.isEmpty) {
                                 return 'Please enter your password';
                               }
+                              if (val.length < 4) {
+                                return 'Password must be at least 4 characters';
+                              }
                               return null;
                             },
                           ),
@@ -267,35 +274,35 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           const SizedBox(height: 12),
 
-                          // Test credentials quick-pill helper
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: InkWell(
-                              onTap: () {
-                                _usernameController.text = 'emilys';
-                                _passwordController.text = 'emilyspass';
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.chipOrangeTint,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: const Text(
-                                  'Fill Demo: emilys / emilyspass',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.primaryOrange,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 24),
+                          // // Test credentials quick-pill helper
+                          // Align(
+                          //   alignment: Alignment.centerRight,
+                          //   child: InkWell(
+                          //     onTap: () {
+                          //       _usernameController.text = 'emilys';
+                          //       _passwordController.text = 'emilyspass';
+                          //     },
+                          //     child: Container(
+                          //       padding: const EdgeInsets.symmetric(
+                          //         horizontal: 10,
+                          //         vertical: 4,
+                          //       ),
+                          //       decoration: BoxDecoration(
+                          //         color: AppColors.chipOrangeTint,
+                          //         borderRadius: BorderRadius.circular(12),
+                          //       ),
+                          //       child: const Text(
+                          //         'Fill Demo: emilys / emilyspass',
+                          //         style: TextStyle(
+                          //           fontSize: 12,
+                          //           fontWeight: FontWeight.w600,
+                          //           color: AppColors.primaryOrange,
+                          //         ),
+                          //       ),
+                          //     ),
+                          //   ),
+                          // ),
+                          // const SizedBox(height: 24),
 
                           // Centered Orange Pill Log In Button
                           Center(
@@ -377,14 +384,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                   );
                                 },
                               ),
-                              if (isBiometricAvailable) ...[
-                                const SizedBox(width: 16),
-                                _buildSocialCircle(
-                                  iconPath: AppAssets.icFingerprint,
-                                  onTap: _onBiometricPressed,
-                                  isOrangeTint: true,
-                                ),
-                              ],
                             ],
                           ),
                           const SizedBox(height: 28),
@@ -426,7 +425,8 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         );
       },
-    );
+    ),
+  );
   }
 
   Widget _buildSocialCircle({

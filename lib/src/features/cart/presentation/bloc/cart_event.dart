@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../domain/entities/cart_item_entity.dart';
+import '../../domain/entities/cart_item_entity.dart';
 
 sealed class CartEvent extends Equatable {
   const CartEvent();

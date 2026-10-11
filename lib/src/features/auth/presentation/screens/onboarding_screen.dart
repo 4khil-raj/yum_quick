@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yum_quick/src/core/constants/app_assets.dart';
 import 'package:yum_quick/src/core/constants/app_colors.dart';
+import 'package:yum_quick/src/core/storage/secure_storage_service.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -42,11 +43,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         curve: Curves.easeInOut,
       );
     } else {
+      SecureStorageService().setOnboardingCompleted(true);
       context.go('/welcome');
     }
   }
 
   void _onSkip() {
+    SecureStorageService().setOnboardingCompleted(true);
     context.go('/welcome');
   }
 
@@ -96,15 +99,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 right: 0,
                 child: Container(
                   color: AppColors.primaryYellow.withValues(alpha: 0.92),
-                  padding: EdgeInsets.only(
-                    top: MediaQuery.of(context).padding.top,
-                    left: 16,
-                    right: 16,
-                    bottom: 8,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
+                  child: SafeArea(
+                    bottom: false,
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        bottom: 8,
+                        top: 4,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
                       GestureDetector(
                         onTap: _onSkip,
                         behavior: HitTestBehavior.opaque,
@@ -138,6 +144,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                 ),
               ),
+            ),
+          ),
 
               // 3. Bottom White Sheet with Curved Top
               Positioned(

@@ -26,11 +26,6 @@ class ConnectivityServiceImpl implements ConnectivityService {
 
   bool _hasConnection(List<ConnectivityResult> results) {
     if (results.isEmpty) return false;
-    return results.any(
-      (r) =>
-          r == ConnectivityResult.mobile ||
-          r == ConnectivityResult.wifi ||
-          r == ConnectivityResult.ethernet,
-    );
+    return results.any((r) => r != ConnectivityResult.none);
   }
 }

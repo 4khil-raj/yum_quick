@@ -1,23 +1,28 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import 'hive_storage_service.dart';
+
 class SecureStorageService {
   final FlutterSecureStorage _storage;
+  final HiveStorageService? hiveStorage;
 
-  SecureStorageService({FlutterSecureStorage? storage})
-    : _storage =
-          storage ??
-          const FlutterSecureStorage(
-            aOptions: AndroidOptions(resetOnError: true),
-            iOptions: IOSOptions(
-              accessibility: KeychainAccessibility.first_unlock,
-            ),
-          );
+  SecureStorageService({
+    FlutterSecureStorage? storage,
+    this.hiveStorage,
+  }) : _storage =
+           storage ??
+           const FlutterSecureStorage(
+             aOptions: AndroidOptions(resetOnError: true),
+             iOptions: IOSOptions(
+               accessibility: KeychainAccessibility.first_unlock,
+             ),
+           );
 
   static const String _keyAccessToken = 'auth_access_token';
   static const String _keyRefreshToken = 'auth_refresh_token';
   static const String _keyUserData = 'auth_user_data';
-  static const String _keyBiometricEnabled = 'auth_biometric_enabled';
   static const String _keySavedUsername = 'auth_saved_username';
+  static const String _keyOnboardingCompleted = 'app_onboarding_completed';
 
   Future<void> saveTokens({
     required String accessToken,
@@ -30,11 +35,24 @@ class SecureStorageService {
   }
 
   Future<String?> getAccessToken() async {
-    return _storage.read(key: _keyAccessToken);
+    try {
+      final token = await _storage.read(key: _keyAccessToken);
+      if (token != null && token.isNotEmpty) return token;
+    } catch (_) {
+      // In case of hardware keystore reset, return null to trigger safe re-authentication
+      return null;
+    }
+    return null;
   }
 
   Future<String?> getRefreshToken() async {
-    return _storage.read(key: _keyRefreshToken);
+    try {
+      final token = await _storage.read(key: _keyRefreshToken);
+      if (token != null && token.isNotEmpty) return token;
+    } catch (_) {
+      return null;
+    }
+    return null;
   }
 
   Future<void> saveUserData(String userDataJson) async {
@@ -42,37 +60,62 @@ class SecureStorageService {
   }
 
   Future<String?> getUserData() async {
-    return _storage.read(key: _keyUserData);
-  }
-
-  Future<void> setBiometricEnabled(bool enabled) async {
-    await _storage.write(
-      key: _keyBiometricEnabled,
-      value: enabled ? 'true' : 'false',
-    );
-  }
-
-  Future<bool> isBiometricEnabled() async {
-    final value = await _storage.read(key: _keyBiometricEnabled);
-    return value == 'true';
+    try {
+      final data = await _storage.read(key: _keyUserData);
+      if (data != null && data.isNotEmpty) return data;
+    } catch (_) {
+      return null;
+    }
+    return null;
   }
 
   Future<void> saveUsername(String username) async {
-    await _storage.write(key: _keySavedUsername, value: username);
+    try {
+      await _storage.write(key: _keySavedUsername, value: username);
+    } catch (_) {}
+    await hiveStorage?.savePreference(_keySavedUsername, username);
   }
 
   Future<String?> getSavedUsername() async {
-    return _storage.read(key: _keySavedUsername);
+    try {
+      final username = await _storage.read(key: _keySavedUsername);
+      if (username != null && username.isNotEmpty) return username;
+    } catch (_) {}
+
+    return hiveStorage?.getPreference(_keySavedUsername);
+  }
+
+  Future<void> setOnboardingCompleted(bool completed) async {
+    final strVal = completed ? 'true' : 'false';
+    try {
+      await _storage.write(key: _keyOnboardingCompleted, value: strVal);
+    } catch (_) {}
+    await hiveStorage?.savePreference(_keyOnboardingCompleted, strVal);
+  }
+
+  Future<bool> isOnboardingCompleted() async {
+    try {
+      final val = await _storage.read(key: _keyOnboardingCompleted);
+      if (val != null) return val == 'true';
+    } catch (_) {}
+
+    final hiveVal = hiveStorage?.getPreference(_keyOnboardingCompleted);
+    if (hiveVal != null) return hiveVal == 'true';
+    return false;
   }
 
   Future<void> clearAll() async {
-    await _storage.delete(key: _keyAccessToken);
-    await _storage.delete(key: _keyRefreshToken);
-    await _storage.delete(key: _keyUserData);
-    // Note: we can keep saved username or biometric preference if desired, but clear tokens
+    try {
+      await _storage.delete(key: _keyAccessToken);
+      await _storage.delete(key: _keyRefreshToken);
+      await _storage.delete(key: _keyUserData);
+    } catch (_) {}
   }
 
   Future<void> fullWipe() async {
-    await _storage.deleteAll();
+    try {
+      await _storage.deleteAll();
+    } catch (_) {}
+    await hiveStorage?.clearPreferences();
   }
 }

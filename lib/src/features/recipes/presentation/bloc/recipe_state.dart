@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:yum_quick/src/core/utils/category_mapper.dart';
 
-import '../domain/entities/recipe_entity.dart';
+import '../../domain/entities/recipe_entity.dart';
 
 sealed class RecipeState extends Equatable {
   const RecipeState();
@@ -45,6 +45,13 @@ class RecipeSuccess extends RecipeState {
     this.isLoadingMore = false,
     this.paginationError,
   });
+
+  /// Filtered subsets provided for clean presentation access
+  List<RecipeEntity> get bestSellers =>
+      recipes.where((r) => r.rating >= 4.7).toList();
+
+  List<RecipeEntity> get recommended =>
+      recipes.where((r) => r.reviewCount >= 30).toList();
 
   RecipeSuccess copyWith({
     List<RecipeEntity>? recipes,

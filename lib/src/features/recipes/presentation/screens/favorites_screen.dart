@@ -6,12 +6,13 @@ import 'package:yum_quick/src/core/constants/app_colors.dart';
 import 'package:yum_quick/src/core/presentation/components/curved_header.dart';
 import 'package:yum_quick/src/core/presentation/components/empty_state_widget.dart';
 import 'package:yum_quick/src/core/presentation/components/food_card.dart';
+import 'package:yum_quick/src/core/utils/app_snackbar.dart';
 import 'package:yum_quick/src/features/cart/domain/entities/cart_item_entity.dart';
-import 'package:yum_quick/src/features/cart/state/cart_bloc.dart';
-import 'package:yum_quick/src/features/cart/state/cart_event.dart';
-import 'package:yum_quick/src/features/recipes/state/recipe_bloc.dart';
-import 'package:yum_quick/src/features/recipes/state/recipe_event.dart';
-import 'package:yum_quick/src/features/recipes/state/recipe_state.dart';
+import 'package:yum_quick/src/features/cart/presentation/bloc/cart_bloc.dart';
+import 'package:yum_quick/src/features/cart/presentation/bloc/cart_event.dart';
+import 'package:yum_quick/src/features/recipes/presentation/bloc/recipe_bloc.dart';
+import 'package:yum_quick/src/features/recipes/presentation/bloc/recipe_event.dart';
+import 'package:yum_quick/src/features/recipes/presentation/bloc/recipe_state.dart';
 
 class FavoritesScreen extends StatelessWidget {
   const FavoritesScreen({super.key});
@@ -20,8 +21,10 @@ class FavoritesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      body: Column(
-        children: [
+      body: SafeArea(
+        top: false,
+        child: Column(
+          children: [
           const CurvedHeader(
             title: Text(
               'My Favorites',
@@ -97,12 +100,9 @@ class FavoritesScreen extends StatelessWidget {
                               ),
                             ),
                           );
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Added ${recipe.name} to cart!'),
-                              backgroundColor: AppColors.primaryOrange,
-                              duration: const Duration(seconds: 1),
-                            ),
+                          AppSnackBar.showSuccess(
+                            context,
+                            message: 'Added to cart!',
                           );
                         },
                       );
@@ -119,6 +119,7 @@ class FavoritesScreen extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 }

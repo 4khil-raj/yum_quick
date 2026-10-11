@@ -21,19 +21,6 @@ class LoginReq extends AuthEvent {
   List<Object?> get props => [username, password];
 }
 
-class BiometricLoginReq extends AuthEvent {
-  const BiometricLoginReq();
-}
-
-class EnableBiometricReq extends AuthEvent {
-  final bool enable;
-
-  const EnableBiometricReq(this.enable);
-
-  @override
-  List<Object?> get props => [enable];
-}
-
 class LogoutReq extends AuthEvent {
   const LogoutReq();
 }

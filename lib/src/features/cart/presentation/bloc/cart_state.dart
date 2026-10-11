@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../domain/entities/cart_item_entity.dart';
+import '../../domain/entities/cart_item_entity.dart';
 
 sealed class CartState extends Equatable {
   const CartState();
@@ -40,7 +40,8 @@ class CartLoaded extends CartState {
     this.recentlyRemovedItem,
   });
 
-  int get totalItemCount => items.fold(0, (sum, item) => sum + item.quantity);
+  int get totalItemCount => items.length;
+  int get totalQuantity => items.fold(0, (sum, item) => sum + item.quantity);
 
   CartLoaded copyWith({
     List<CartItemEntity>? items,

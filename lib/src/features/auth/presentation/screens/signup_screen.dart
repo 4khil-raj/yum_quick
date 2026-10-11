@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:yum_quick/src/core/constants/app_assets.dart';
 import 'package:yum_quick/src/core/constants/app_colors.dart';
 import 'package:yum_quick/src/core/presentation/components/app_text_field.dart';
+import 'package:yum_quick/src/core/presentation/components/offline_banner.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -46,12 +47,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.primaryYellow,
-      body: Column(
-        children: [
-          // 1. Curved Yellow Header
-          SafeArea(
-            bottom: false,
-            child: Padding(
+      body: SafeArea(
+        bottom: true,
+        child: Column(
+          children: [
+            const OfflineBanner(),
+            // 1. Curved Yellow Header
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
                 children: [
@@ -80,9 +82,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ],
               ),
             ),
-          ),
 
-          // 2. White Curved Card Body
+            // 2. White Curved Card Body
           Expanded(
             child: Container(
               width: double.infinity,
@@ -276,12 +277,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             iconPath: AppAssets.icFacebook,
                             onTap: () {},
                           ),
-                          const SizedBox(width: 16),
-                          _buildSocialCircle(
-                            iconPath: AppAssets.icFingerprint,
-                            onTap: () => context.push('/biometric'),
-                            isOrangeTint: true,
-                          ),
                         ],
                       ),
                       const SizedBox(height: 24),
@@ -321,8 +316,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildSocialCircle({
     required String iconPath,

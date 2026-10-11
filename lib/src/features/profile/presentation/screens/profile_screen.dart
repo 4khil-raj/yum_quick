@@ -4,32 +4,34 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yum_quick/src/core/constants/app_assets.dart';
 import 'package:yum_quick/src/core/constants/app_colors.dart';
+import 'package:yum_quick/src/core/presentation/components/offline_banner.dart';
 
-import '../../../auth/state/auth_bloc.dart';
-import '../../../auth/state/auth_event.dart';
-import '../../../auth/state/auth_state.dart';
+import '../../../auth/presentation/bloc/auth_bloc.dart';
+import '../../../auth/presentation/bloc/auth_event.dart';
+import '../../../auth/presentation/bloc/auth_state.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthBloc, AuthState>(
-      builder: (context, state) {
-        final user = state is Authenticated ? state.user : null;
-        final displayName = user != null && user.fullName.isNotEmpty
-            ? user.fullName
-            : 'John Smith';
-        final displayEmail = user != null && user.email.isNotEmpty
-            ? user.email
-            : 'Loremipsum@email.com';
+    return Scaffold(
+      backgroundColor: AppColors.primaryYellow,
+      body: BlocBuilder<AuthBloc, AuthState>(
+        builder: (context, state) {
+          final user = state is Authenticated ? state.user : null;
+          final displayName = user != null && user.fullName.isNotEmpty
+              ? user.fullName
+              : 'John Smith';
+          final displayEmail = user != null && user.email.isNotEmpty
+              ? user.email
+              : 'Loremipsum@email.com';
 
-        return Scaffold(
-          backgroundColor: AppColors.primaryYellow,
-          body: SafeArea(
+          return SafeArea(
             bottom: false,
             child: Column(
               children: [
+                const OfflineBanner(),
                 // Curved Orange Side-Drawer Styled Container
                 Expanded(
                   child: Container(
@@ -153,14 +155,7 @@ class ProfileScreen extends StatelessWidget {
                             },
                           ),
 
-                          // 5. Contact Us
-                          _buildMenuItem(
-                            iconPath: AppAssets.icSupport,
-                            title: 'Contact Us',
-                            onTap: () => context.push('/support'),
-                          ),
-
-                          // 6. Help & FAQs
+                          // 5. Help & FAQs
                           _buildMenuItem(
                             iconPath: AppAssets.icInfo,
                             title: 'Help & FAQs',
@@ -207,9 +202,9 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 

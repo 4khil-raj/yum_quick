@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:yum_quick/src/features/cart/state/cart_bloc.dart';
-import 'package:yum_quick/src/features/cart/state/cart_state.dart';
+import 'package:yum_quick/src/features/cart/presentation/bloc/cart_bloc.dart';
+import 'package:yum_quick/src/features/cart/presentation/bloc/cart_state.dart';
 import 'package:yum_quick/src/features/recipes/domain/repositories/recipe_repository.dart';
 import 'package:yum_quick/src/features/search/presentation/screens/filter_screen.dart';
-import 'package:yum_quick/src/features/search/state/search_bloc.dart';
+import 'package:yum_quick/src/features/search/presentation/bloc/search_bloc.dart';
 
 class MockRecipeRepository extends Mock implements RecipeRepository {}
 
@@ -76,10 +76,10 @@ void main() {
 
     // 6. Verify Price section and Apply button
     expect(find.text('Price'), findsOneWidget);
-    expect(find.text('\$1'), findsOneWidget);
-    expect(find.text('\$10'), findsOneWidget);
-    expect(find.text('\$50'), findsOneWidget);
-    expect(find.text('\$100 >'), findsOneWidget);
+    expect(find.text('₹99'), findsOneWidget);
+    expect(find.text('₹199'), findsOneWidget);
+    expect(find.text('₹299'), findsOneWidget);
+    expect(find.text('₹499 >'), findsOneWidget);
     expect(find.widgetWithText(ElevatedButton, 'Apply'), findsOneWidget);
 
     // 7. Tap Apply button

@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:yum_quick/src/core/utils/pricing_calculator.dart';
 
-import '../domain/entities/cart_item_entity.dart';
-import '../domain/repositories/cart_repository.dart';
+import '../../domain/entities/cart_item_entity.dart';
+import '../../domain/repositories/cart_repository.dart';
 import 'cart_event.dart';
 import 'cart_state.dart';
 
@@ -14,7 +14,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   CartBloc({required this.cartRepository}) : super(const CartInitial()) {
     on<LoadCartReq>(_onLoadCart);
     on<AddToCartReq>(_onAddToCart);
-    on<RemoveCartReqOrItem>(_onRemoveCartItem);
+    on<RemoveFromCartReq>(_onRemoveCartItem);
     on<UpdateCartQuantityReq>(_onUpdateCartQuantity);
     on<RestoreRemovedCartItemReq>(_onRestoreRemovedItem);
     on<ApplyPromoCodeReq>(_onApplyPromoCode);
@@ -57,7 +57,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   }
 
   Future<void> _onRemoveCartItem(
-    RemoveCartReqOrItem event,
+    RemoveFromCartReq event,
     Emitter<CartState> emit,
   ) async {
     final currentItems = _getCurrentItems();
@@ -176,6 +176,3 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     );
   }
 }
-
-// Typed alias for RemoveFromCartReq
-typedef RemoveCartReqOrItem = RemoveFromCartReq;

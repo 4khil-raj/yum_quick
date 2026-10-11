@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:local_auth/local_auth.dart';
 import 'package:yum_quick/src/core/storage/secure_storage_service.dart';
 
 import '../models/user_model.dart';
@@ -11,22 +10,16 @@ abstract class AuthLocalDataSource {
   Future<void> saveUser(UserModel user);
   Future<UserModel?> getUser();
   Future<void> clearAuth();
-  Future<bool> isBiometricAvailable();
-  Future<bool> authenticateWithBiometrics();
-  Future<void> setBiometricEnabled(bool enabled);
-  Future<bool> isBiometricEnabled();
   Future<void> saveUsername(String username);
   Future<String?> getSavedUsername();
 }
 
 class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   final SecureStorageService secureStorage;
-  final LocalAuthentication localAuth;
 
   AuthLocalDataSourceImpl({
     required this.secureStorage,
-    LocalAuthentication? customLocalAuth,
-  }) : localAuth = customLocalAuth ?? LocalAuthentication();
+  });
 
   @override
   Future<void> saveTokens({
@@ -47,6 +40,7 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   @override
   Future<void> saveUser(UserModel user) async {
     await secureStorage.saveUserData(jsonEncode(user.toJson()));
+    await secureStorage.setOnboardingCompleted(true);
   }
 
   @override
@@ -63,43 +57,6 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   @override
   Future<void> clearAuth() async {
     await secureStorage.clearAll();
-  }
-
-  @override
-  Future<bool> isBiometricAvailable() async {
-    try {
-      final canAuthWithBiometrics = await localAuth.canCheckBiometrics;
-      final isDeviceSupported = await localAuth.isDeviceSupported();
-      if (!canAuthWithBiometrics && !isDeviceSupported) return false;
-      final availableBiometrics = await localAuth.getAvailableBiometrics();
-      return availableBiometrics.isNotEmpty;
-    } catch (_) {
-      return false;
-    }
-  }
-
-  @override
-  Future<bool> authenticateWithBiometrics() async {
-    try {
-      return await localAuth.authenticate(
-        localizedReason:
-            'Please authenticate with biometrics to access YumQuick',
-        biometricOnly: true,
-        persistAcrossBackgrounding: true,
-      );
-    } catch (_) {
-      return false;
-    }
-  }
-
-  @override
-  Future<void> setBiometricEnabled(bool enabled) async {
-    await secureStorage.setBiometricEnabled(enabled);
-  }
-
-  @override
-  Future<bool> isBiometricEnabled() async {
-    return secureStorage.isBiometricEnabled();
   }
 
   @override

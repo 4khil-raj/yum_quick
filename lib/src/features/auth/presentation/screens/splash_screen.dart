@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:yum_quick/src/core/constants/app_assets.dart';
 import 'package:yum_quick/src/core/constants/app_colors.dart';
-import 'package:yum_quick/src/core/di/injection.dart';
+import 'package:yum_quick/src/core/storage/secure_storage_service.dart';
 
-import '../../state/auth_state.dart';
+import '../bloc/auth_bloc.dart';
+import '../bloc/auth_state.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -39,12 +41,38 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> _checkNavigation() async {
-    await Future.delayed(const Duration(milliseconds: 2000));
+    await Future.delayed(const Duration(milliseconds: 1400));
     if (!mounted) return;
 
-    final authState = ServiceLocator.authBloc.state;
+    // 1. Wait for AuthBloc session verification to finish if still resolving
+    final authBloc = context.read<AuthBloc>();
+    AuthState authState = authBloc.state;
+    if (authState is AuthInitial || authState is AuthLoading) {
+      try {
+        authState = await authBloc.stream
+            .firstWhere((s) => s is! AuthInitial && s is! AuthLoading)
+            .timeout(const Duration(milliseconds: 1200));
+      } catch (_) {
+        authState = authBloc.state;
+      }
+    }
+
+    if (!mounted) return;
+
+    // 2. If authenticated, proceed directly to /home
     if (authState is Authenticated) {
       context.go('/home');
+      return;
+    }
+
+    // 3. If not authenticated, check if onboarding was already completed
+    final hasCompletedOnboarding =
+        await SecureStorageService().isOnboardingCompleted();
+
+    if (!mounted) return;
+
+    if (hasCompletedOnboarding) {
+      context.go('/welcome');
     } else {
       context.go('/onboarding');
     }
@@ -60,20 +88,22 @@ class _SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.primaryYellow,
-      body: Center(
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: ScaleTransition(
-            scale: _scaleAnimation,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(
-                  AppAssets.logoOrange,
-                  width: 240,
-                  fit: BoxFit.contain,
-                ),
-              ],
+      body: SafeArea(
+        child: Center(
+          child: FadeTransition(
+            opacity: _fadeAnimation,
+            child: ScaleTransition(
+              scale: _scaleAnimation,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    AppAssets.logoOrange,
+                    width: 240,
+                    fit: BoxFit.contain,
+                  ),
+                ],
+              ),
             ),
           ),
         ),

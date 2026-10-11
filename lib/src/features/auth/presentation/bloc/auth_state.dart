@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../domain/entities/user_entity.dart';
+import '../../domain/entities/user_entity.dart';
 
 sealed class AuthState extends Equatable {
   const AuthState();
@@ -23,52 +23,35 @@ class AuthLoading extends AuthState {
 
 class Authenticated extends AuthState {
   final UserEntity user;
-  final bool isBiometricSupported;
-  final bool isBiometricEnabled;
 
-  const Authenticated({
-    required this.user,
-    this.isBiometricSupported = false,
-    this.isBiometricEnabled = false,
-  });
+  const Authenticated({required this.user});
 
   @override
-  List<Object?> get props => [user, isBiometricSupported, isBiometricEnabled];
+  List<Object?> get props => [user];
 }
 
 class Unauthenticated extends AuthState {
   final String? savedUsername;
-  final bool isBiometricSupported;
-  final bool isBiometricEnabled;
   final String? sessionExpiredMessage;
 
   const Unauthenticated({
     this.savedUsername,
-    this.isBiometricSupported = false,
-    this.isBiometricEnabled = false,
     this.sessionExpiredMessage,
   });
 
   @override
-  List<Object?> get props => [
-    savedUsername,
-    isBiometricSupported,
-    isBiometricEnabled,
-    sessionExpiredMessage,
-  ];
+  List<Object?> get props => [savedUsername, sessionExpiredMessage];
 }
 
 class AuthError extends AuthState {
   final String message;
   final String? savedUsername;
-  final bool isBiometricSupported;
 
   const AuthError({
     required this.message,
     this.savedUsername,
-    this.isBiometricSupported = false,
   });
 
   @override
-  List<Object?> get props => [message, savedUsername, isBiometricSupported];
+  List<Object?> get props => [message, savedUsername];
 }

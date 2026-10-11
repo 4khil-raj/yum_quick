@@ -10,9 +10,9 @@ import 'package:yum_quick/src/core/presentation/components/empty_state_widget.da
 import 'package:yum_quick/src/core/presentation/components/quantity_control.dart';
 import 'package:yum_quick/src/core/utils/pricing_calculator.dart';
 import 'package:yum_quick/src/features/cart/domain/entities/cart_item_entity.dart';
-import 'package:yum_quick/src/features/cart/state/cart_bloc.dart';
-import 'package:yum_quick/src/features/cart/state/cart_event.dart';
-import 'package:yum_quick/src/features/cart/state/cart_state.dart';
+import 'package:yum_quick/src/features/cart/presentation/bloc/cart_bloc.dart';
+import 'package:yum_quick/src/features/cart/presentation/bloc/cart_event.dart';
+import 'package:yum_quick/src/features/cart/presentation/bloc/cart_state.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -89,10 +89,26 @@ class _CartScreenState extends State<CartScreen> {
         },
         builder: (context, state) {
           if (state is CartEmpty) {
-            return Column(
+            return SafeArea(
+              top: false,
+              child: Column(
               children: [
-                const CurvedHeader(
-                  title: Text(
+                CurvedHeader(
+                  leading: IconButton(
+                    icon: Image.asset(
+                      AppAssets.icArrowBack,
+                      width: 28,
+                      height: 28,
+                    ),
+                    onPressed: () {
+                      if (context.canPop()) {
+                        context.pop();
+                      } else {
+                        context.go('/home');
+                      }
+                    },
+                  ),
+                  title: const Text(
                     'My Cart',
                     style: TextStyle(
                       fontSize: 20,
@@ -123,23 +139,32 @@ class _CartScreenState extends State<CartScreen> {
                   ),
                 ),
               ],
-            );
-          }
+            ),
+          );
+        }
 
           if (state is CartLoaded) {
-            return Column(
+            return SafeArea(
+              top: false,
+              child: Column(
               children: [
                 CurvedHeader(
                   leading: IconButton(
                     icon: Image.asset(
                       AppAssets.icArrowBack,
-                      width: 20,
-                      height: 20,
+                      width: 28,
+                      height: 28,
                     ),
-                    onPressed: () => context.pop(),
+                    onPressed: () {
+                      if (context.canPop()) {
+                        context.pop();
+                      } else {
+                        context.go('/home');
+                      }
+                    },
                   ),
                   title: Text(
-                    'My Cart (${state.totalItemCount} items)',
+                    'My Cart (${state.totalItemCount} ${state.totalItemCount == 1 ? 'item' : 'items'})',
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
@@ -150,8 +175,8 @@ class _CartScreenState extends State<CartScreen> {
                     IconButton(
                       icon: Image.asset(
                         AppAssets.icDelete,
-                        width: 20,
-                        height: 20,
+                        width: 28,
+                        height: 28,
                         color: AppColors.error,
                       ),
                       onPressed: () {
@@ -199,8 +224,9 @@ class _CartScreenState extends State<CartScreen> {
                   ),
                 ),
               ],
-            );
-          }
+            ),
+          );
+        }
 
           return const Center(
             child: CircularProgressIndicator(color: AppColors.primaryOrange),

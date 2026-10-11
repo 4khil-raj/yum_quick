@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../features/auth/presentation/screens/biometric_screen.dart';
 import '../features/auth/presentation/screens/login_screen.dart';
 import '../features/auth/presentation/screens/onboarding_screen.dart';
 import '../features/auth/presentation/screens/signup_screen.dart';
@@ -22,7 +21,6 @@ import '../features/recipes/presentation/screens/menu_screen.dart';
 import '../features/recipes/presentation/screens/recipe_detail_screen.dart';
 import '../features/recipes/presentation/screens/recommendations_screen.dart';
 import '../features/search/presentation/screens/filter_screen.dart';
-import '../features/support/presentation/screens/support_chat_screen.dart';
 import 'main_navigation_shell.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -42,10 +40,6 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
     GoRoute(path: '/signup', builder: (context, state) => const SignUpScreen()),
-    GoRoute(
-      path: '/biometric',
-      builder: (context, state) => const BiometricScreen(),
-    ),
 
     // Stateful Nested Bottom Navigation Shell
     StatefulShellRoute.indexedStack(
@@ -149,11 +143,6 @@ final GoRouter appRouter = GoRouter(
         final order = state.extra as OrderEntity;
         return LiveTrackingScreen(order: order);
       },
-    ),
-    GoRoute(
-      path: '/support',
-      parentNavigatorKey: _rootNavigatorKey,
-      builder: (context, state) => const SupportChatScreen(),
     ),
   ],
 );
