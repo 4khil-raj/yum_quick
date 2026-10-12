@@ -1,0 +1,35 @@
+import 'package:flutter/material.dart';
+
+class AppColors {
+  AppColors._();
+
+  static const Color primaryYellow = Color(0xFFF5CB58);
+  static const Color primaryOrange = Color(0xFFE95421);
+  static const Color accentOrange = Color(0xFFFF6430);
+
+  static const Color backgroundLight = Color(0xFFFFFFFF);
+  static const Color surfaceWarm = Color(0xFFFDFBF7);
+  static const Color surfaceSoft = Color(0xFFF7F5F0);
+  static const Color fieldFill = Color(0xFFF3E9B5);
+  static const Color fieldFillLight = Color(0xFFFBF7E4);
+
+  static const Color chipOrangeTint = Color(0xFFFFDECF);
+  static const Color chipYellowTint = Color(0xFFFCE9A6);
+  static const Color yellowLight = Color(0xFFFFF3CD);
+  static const Color creamButton = Color(0xFFF8ECC0);
+  static const Color creamCard = Color(0xFFFDF1CC);
+  static const Color inactiveDot = Color(0xFFF8ECC0);
+
+  static const Color textPrimary = Color(0xFF3E1B0E);
+  static const Color textSecondary = Color(0xFF7D6559);
+  static const Color textMuted = Color(0xFFA59288);
+  static const Color textLight = Color(0xFFFFFFFF);
+
+  static const Color success = Color(0xFF2E7D32);
+  static const Color error = Color(0xFFD32F2F);
+  static const Color warning = Color(0xFFED6C02);
+  static const Color starYellow = Color(0xFFFFB800);
+  static const Color divider = Color(0xFFEEEAE2);
+  static const Color border = Color(0xFFE5DECF);
+  static const Color shadow = Color(0x143E1B0E);
+}

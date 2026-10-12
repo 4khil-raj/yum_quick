@@ -1,12 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:yum_quick/src/core/errors/exceptions.dart';
-import 'package:yum_quick/src/core/errors/failures.dart';
-import 'package:yum_quick/src/core/utils/category_mapper.dart';
-import 'package:yum_quick/src/features/recipes/data/datasources/recipe_local_data_source.dart';
-import 'package:yum_quick/src/features/recipes/data/datasources/recipe_remote_data_source.dart';
-import 'package:yum_quick/src/features/recipes/data/models/recipe_model.dart';
-import 'package:yum_quick/src/features/recipes/data/repositories/recipe_repository_impl.dart';
+import 'package:yum_quick/core/errors/exceptions.dart';
+import 'package:yum_quick/core/errors/failures.dart';
+import 'package:yum_quick/core/utils/category_mapper.dart';
+import 'package:yum_quick/features/recipes/data/datasources/recipe_local_data_source.dart';
+import 'package:yum_quick/features/recipes/data/datasources/recipe_remote_data_source.dart';
+import 'package:yum_quick/features/recipes/data/models/recipe_model.dart';
+import 'package:yum_quick/features/recipes/data/repositories/recipe_repository_impl.dart';
 
 class MockRecipeRemoteDataSource extends Mock
     implements RecipeRemoteDataSource {}
@@ -124,7 +124,6 @@ void main() {
       when(() => mockLocalDataSource.cacheFirstPageRecipes(sampleRawResponse))
           .thenAnswer((_) async => Future.value());
 
-      // Category Meal should match Dinner
       final mealResult = await repository.getRecipes(
         limit: 10,
         skip: 0,
@@ -132,7 +131,6 @@ void main() {
       );
       expect(mealResult.recipes.length, equals(1));
 
-      // Category Drinks should NOT match Dinner Pizza
       final drinksResult = await repository.getRecipes(
         limit: 10,
         skip: 0,

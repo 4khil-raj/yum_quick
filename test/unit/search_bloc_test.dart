@@ -1,11 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:yum_quick/src/core/utils/category_mapper.dart';
-import 'package:yum_quick/src/features/recipes/domain/entities/recipe_entity.dart';
-import 'package:yum_quick/src/features/recipes/domain/repositories/recipe_repository.dart';
-import 'package:yum_quick/src/features/search/presentation/bloc/search_bloc.dart';
-import 'package:yum_quick/src/features/search/presentation/bloc/search_event.dart';
-import 'package:yum_quick/src/features/search/presentation/bloc/search_state.dart';
+import 'package:yum_quick/core/utils/category_mapper.dart';
+import 'package:yum_quick/features/recipes/domain/entities/recipe_entity.dart';
+import 'package:yum_quick/features/recipes/domain/repositories/recipe_repository.dart';
+import 'package:yum_quick/features/search/presentation/bloc/search_bloc.dart';
+import 'package:yum_quick/features/search/presentation/bloc/search_event.dart';
+import 'package:yum_quick/features/search/presentation/bloc/search_state.dart';
 
 class MockRecipeRepository extends Mock implements RecipeRepository {}
 
@@ -183,7 +183,7 @@ void main() {
       emits(
         predicate<SearchSuccess>((state) {
           return state.selectedCategory == RecipeCategory.snacks &&
-              state.results.length == 2 && // Cookies & Bruschetta
+              state.results.length == 2 &&
               state.results.any((r) => r.name.contains('Bruschetta')) &&
               state.results.any((r) => r.name.contains('Cookies'));
         }),
@@ -195,7 +195,6 @@ void main() {
     searchBloc.add(const SearchRecipesReq(''));
     await expectLater(searchBloc.stream, emitsThrough(isA<SearchSuccess>()));
 
-    // Set category with a specific tag
     searchBloc.add(
       const UpdateFilterReq(
         category: RecipeCategory.snacks,
@@ -213,7 +212,6 @@ void main() {
       ),
     );
 
-    // Switch to category meal without passing tags -> should reset tags to empty
     searchBloc.add(const UpdateFilterReq(category: RecipeCategory.meal));
 
     await expectLater(
@@ -222,7 +220,7 @@ void main() {
         predicate<SearchSuccess>((state) {
           return state.selectedCategory == RecipeCategory.meal &&
               state.selectedTags.isEmpty &&
-              state.results.length == 2 && // Margherita Pizza (Dinner) & Falafel Wrap (Lunch)
+              state.results.length == 2 &&
               state.results.any((r) => r.name.contains('Pizza'));
         }),
       ),
@@ -237,7 +235,7 @@ void main() {
       emitsInOrder([
         isA<SearchLoading>(),
         predicate<SearchSuccess>((state) {
-          return state.results.length == 2 && // Pizza and Bruschetta
+          return state.results.length == 2 &&
               state.results.any((r) => r.name.contains('Pizza')) &&
               state.results.any((r) => r.name.contains('Bruschetta'));
         }),

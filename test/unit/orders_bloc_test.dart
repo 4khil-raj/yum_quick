@@ -1,11 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:yum_quick/src/features/cart/domain/entities/cart_item_entity.dart';
-import 'package:yum_quick/src/features/orders/domain/entities/order_entity.dart';
-import 'package:yum_quick/src/features/orders/domain/repositories/orders_repository.dart';
-import 'package:yum_quick/src/features/orders/presentation/bloc/orders_bloc.dart';
-import 'package:yum_quick/src/features/orders/presentation/bloc/orders_event.dart';
-import 'package:yum_quick/src/features/orders/presentation/bloc/orders_state.dart';
+import 'package:yum_quick/features/cart/domain/entities/cart_item_entity.dart';
+import 'package:yum_quick/features/orders/domain/entities/order_entity.dart';
+import 'package:yum_quick/features/orders/domain/repositories/orders_repository.dart';
+import 'package:yum_quick/features/orders/presentation/bloc/orders_bloc.dart';
+import 'package:yum_quick/features/orders/presentation/bloc/orders_event.dart';
+import 'package:yum_quick/features/orders/presentation/bloc/orders_state.dart';
 
 class MockOrdersRepository extends Mock implements OrdersRepository {}
 

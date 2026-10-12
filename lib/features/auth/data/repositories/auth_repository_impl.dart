@@ -1,0 +1,94 @@
+import 'package:yum_quick/core/errors/exceptions.dart';
+import 'package:yum_quick/core/errors/failures.dart';
+
+import '../../domain/entities/user_entity.dart';
+import '../../domain/repositories/auth_repository.dart';
+import '../datasources/auth_local_data_source.dart';
+import '../datasources/auth_remote_data_source.dart';
+
+class AuthRepositoryImpl implements AuthRepository {
+  final AuthRemoteDataSource remoteDataSource;
+  final AuthLocalDataSource localDataSource;
+
+  AuthRepositoryImpl({
+    required this.remoteDataSource,
+    required this.localDataSource,
+  });
+
+  @override
+  Future<UserEntity> login({
+    required String username,
+    required String password,
+  }) async {
+    try {
+      final user = await remoteDataSource.login(
+        username: username,
+        password: password,
+      );
+
+      if (user.accessToken != null) {
+        await localDataSource.saveTokens(
+          accessToken: user.accessToken!,
+          refreshToken: user.refreshToken,
+        );
+      }
+      await localDataSource.saveUser(user);
+      await localDataSource.saveUsername(username);
+
+      return user.toEntity();
+    } on AuthException catch (e) {
+      throw AuthFailure(e.message);
+    } on NetworkException catch (e) {
+      throw NetworkFailure(e.message);
+    } on ServerException catch (e) {
+      throw ServerFailure(e.message, statusCode: e.statusCode);
+    } catch (e) {
+      throw UnexpectedFailure(e.toString());
+    }
+  }
+
+  @override
+  Future<UserEntity?> restoreSession() async {
+    try {
+      final token = await localDataSource.getAccessToken();
+      if (token == null || token.isEmpty) {
+        return null;
+      }
+
+      final cachedUser = await localDataSource.getUser();
+      if (cachedUser != null) {
+        return cachedUser.toEntity();
+      }
+
+      final savedUser = await localDataSource.getSavedUsername();
+      if (savedUser != null && savedUser.isNotEmpty) {
+        return UserEntity(
+          id: 1,
+          username: savedUser,
+          email: '$savedUser@email.com',
+          firstName: savedUser,
+          lastName: '',
+          accessToken: token,
+        );
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @override
+  Future<void> logout() async {
+    await localDataSource.clearAuth();
+  }
+
+  @override
+  Future<String?> getSavedUsername() async {
+    return localDataSource.getSavedUsername();
+  }
+
+  @override
+  Future<void> saveUsername(String username) async {
+    await localDataSource.saveUsername(username);
+  }
+}

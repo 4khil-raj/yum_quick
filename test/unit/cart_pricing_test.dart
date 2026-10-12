@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:yum_quick/src/core/utils/pricing_calculator.dart';
-import 'package:yum_quick/src/features/cart/domain/entities/cart_item_entity.dart';
+import 'package:yum_quick/core/utils/pricing_calculator.dart';
+import 'package:yum_quick/features/cart/domain/entities/cart_item_entity.dart';
 
 void main() {
   group('PricingCalculator Tests', () {
@@ -11,7 +11,7 @@ void main() {
         final p2 = PricingCalculator.priceForRecipe(1);
         final p10 = PricingCalculator.priceForRecipe(10);
 
-        expect(p1, equals(p2)); // Deterministic
+        expect(p1, equals(p2));
         expect(p1, greaterThanOrEqualTo(99.0));
         expect(p1, lessThanOrEqualTo(499.0));
         expect(p10, greaterThanOrEqualTo(99.0));
@@ -62,18 +62,15 @@ void main() {
     });
 
     test('calculateTotal sums subtotal, tax, fees, and subtracts discount', () {
-      // Subtotal = 200, Tax = 10, Delivery = 40, Service = 15, Discount = 0 -> 265
       final totalNoDiscount = PricingCalculator.calculateTotal(subtotal: 200.0);
       expect(totalNoDiscount, equals(265.0));
 
-      // With 20 discount -> 245
       final totalWithDiscount = PricingCalculator.calculateTotal(
         subtotal: 200.0,
         discount: 20.0,
       );
       expect(totalWithDiscount, equals(245.0));
 
-      // Subtotal = 600 (Free delivery), Tax = 30, Delivery = 0, Service = 15 -> 645
       final totalFreeDelivery = PricingCalculator.calculateTotal(
         subtotal: 600.0,
       );

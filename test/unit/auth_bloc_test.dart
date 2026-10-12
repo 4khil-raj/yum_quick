@@ -1,11 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:yum_quick/src/core/errors/failures.dart';
-import 'package:yum_quick/src/features/auth/domain/entities/user_entity.dart';
-import 'package:yum_quick/src/features/auth/domain/repositories/auth_repository.dart';
-import 'package:yum_quick/src/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:yum_quick/src/features/auth/presentation/bloc/auth_event.dart';
-import 'package:yum_quick/src/features/auth/presentation/bloc/auth_state.dart';
+import 'package:yum_quick/core/errors/failures.dart';
+import 'package:yum_quick/features/auth/domain/entities/user_entity.dart';
+import 'package:yum_quick/features/auth/domain/repositories/auth_repository.dart';
+import 'package:yum_quick/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:yum_quick/features/auth/presentation/bloc/auth_event.dart';
+import 'package:yum_quick/features/auth/presentation/bloc/auth_state.dart';
 
 class MockAuthRepository extends Mock implements AuthRepository {}
 

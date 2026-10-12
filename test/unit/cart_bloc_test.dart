@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:yum_quick/src/features/cart/domain/entities/cart_item_entity.dart';
-import 'package:yum_quick/src/features/cart/domain/repositories/cart_repository.dart';
-import 'package:yum_quick/src/features/cart/presentation/bloc/cart_bloc.dart';
-import 'package:yum_quick/src/features/cart/presentation/bloc/cart_event.dart';
-import 'package:yum_quick/src/features/cart/presentation/bloc/cart_state.dart';
+import 'package:yum_quick/features/cart/domain/entities/cart_item_entity.dart';
+import 'package:yum_quick/features/cart/domain/repositories/cart_repository.dart';
+import 'package:yum_quick/features/cart/presentation/bloc/cart_bloc.dart';
+import 'package:yum_quick/features/cart/presentation/bloc/cart_event.dart';
+import 'package:yum_quick/features/cart/presentation/bloc/cart_state.dart';
 
 class MockCartRepository extends Mock implements CartRepository {}
 
@@ -69,7 +69,7 @@ void main() {
         isA<CartLoading>(),
         predicate<CartLoaded>((state) {
           return state.items.length == 2 &&
-              state.subtotal == 500.0 && // 200 + 300
+              state.subtotal == 500.0 &&
               state.totalItemCount == 2 &&
               state.totalQuantity == 3;
         }),
@@ -109,7 +109,7 @@ void main() {
         predicate<CartLoaded>((state) {
           return state.items.first.quantity == 3 &&
               state.subtotal == 600.0 &&
-              state.deliveryFee == 0.0; // Free delivery over ₹500
+              state.deliveryFee == 0.0;
         }),
       ),
     );
@@ -146,7 +146,7 @@ void main() {
       emits(
         predicate<CartLoaded>((state) {
           return state.promoCode == 'YUM10' &&
-              state.discount == 20.0; // 10% of 200
+              state.discount == 20.0;
         }),
       ),
     );

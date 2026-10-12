@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:yum_quick/src/features/cart/domain/entities/cart_item_entity.dart';
-import 'package:yum_quick/src/features/orders/data/datasources/orders_local_data_source.dart';
-import 'package:yum_quick/src/features/orders/data/models/order_model.dart';
-import 'package:yum_quick/src/features/orders/data/repositories/orders_repository_impl.dart';
-import 'package:yum_quick/src/features/orders/domain/entities/order_entity.dart';
+import 'package:yum_quick/features/cart/domain/entities/cart_item_entity.dart';
+import 'package:yum_quick/features/orders/data/datasources/orders_local_data_source.dart';
+import 'package:yum_quick/features/orders/data/models/order_model.dart';
+import 'package:yum_quick/features/orders/data/repositories/orders_repository_impl.dart';
+import 'package:yum_quick/features/orders/domain/entities/order_entity.dart';
 
 class MockOrdersLocalDataSource extends Mock implements OrdersLocalDataSource {}
 
